@@ -1,51 +1,21 @@
 import { NextRequest } from "next/server";
-import fs from "fs";
-import path from "path";
+import connectToDatabase from "@/lib/mongoose";
+import Submission from "@/models/Submission";
 
 export const dynamic = "force-dynamic";
 
-const FILE_PATH = path.join(process.cwd(), "waitlist.json");
-
-interface Submission {
-  id: string;
-  name: string;
-  email: string;
-  message: string;
-  timestamp: string;
-}
-
-function getSubmissions(): Submission[] {
-  try {
-    if (!fs.existsSync(FILE_PATH)) {
-      return [];
-    }
-    const data = fs.readFileSync(FILE_PATH, "utf8");
-    return JSON.parse(data) || [];
-  } catch (error) {
-    console.error("Error reading waitlist database:", error);
-    return [];
-  }
-}
-
-function saveSubmissions(submissions: Submission[]): boolean {
-  try {
-    // Ensure containing directory exists (just in case)
-    const dir = path.dirname(FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(FILE_PATH, JSON.stringify(submissions, null, 2), "utf8");
-    return true;
-  } catch (error) {
-    console.error("Error writing waitlist database:", error);
-    return false;
-  }
-}
-
 export async function GET() {
-  const submissions = getSubmissions();
-  const count = 60 + submissions.length;
-  return Response.json({ count });
+  try {
+    await connectToDatabase();
+    // Count total submissions in the database
+    const submissionsCount = await Submission.countDocuments();
+    // Adding 60 as base count, same as before
+    const count = 60 + submissionsCount;
+    return Response.json({ count });
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+    return Response.json({ error: "Failed to fetch count" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -68,28 +38,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const submissions = getSubmissions();
-    
-    // Create new submission entry
-    const newSubmission: Submission = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      message: (message || "").trim(),
-      timestamp: new Date().toISOString(),
-    };
+    await connectToDatabase();
 
-    submissions.push(newSubmission);
-    const success = saveSubmissions(submissions);
-
-    if (!success) {
+    // Check if email already exists
+    const existingSubmission = await Submission.findOne({ email: email.trim().toLowerCase() });
+    if (existingSubmission) {
       return Response.json(
-        { error: "Could not save to waitlist database." },
-        { status: 500 }
+        { error: "This email is already on the waitlist." },
+        { status: 400 }
       );
     }
 
-    const count = 60 + submissions.length;
+    // Create new submission entry in MongoDB
+    const newSubmission = await Submission.create({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      message: (message || "").trim(),
+    });
+
+    const submissionsCount = await Submission.countDocuments();
+    const count = 60 + submissionsCount;
+    
     return Response.json({ success: true, count });
   } catch (error) {
     console.error("Waitlist API handler error:", error);
