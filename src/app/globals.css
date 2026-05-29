@@ -162,11 +162,23 @@ html, body {
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-family: var(--font-playfair), serif;
   font-size: 32px;
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
+}
+
+.logo-img {
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-img {
+  transform: rotate(-5deg) scale(1.05);
 }
 
 .nav-links {
@@ -942,6 +954,22 @@ footer {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.footer-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.footer-logo-img {
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.footer-logo-link:hover .footer-logo-img {
+  transform: rotate(-5deg) scale(1.05);
 }
 
 .footer-brand-title {

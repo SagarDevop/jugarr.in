@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import logoImg from "../../public/assets/logo.png";
 
 export default function Header() {
   const [activeHash, setActiveHash] = useState("");
@@ -47,7 +49,15 @@ export default function Header() {
     <nav className="navbar">
       <div className="container navbar-inner">
         <Link href="/" className="logo" onClick={() => setActiveHash("")}>
-          Jugarr
+          <Image
+            src={logoImg}
+            alt="Jugarr Logo"
+            width={36}
+            height={36}
+            className="logo-img"
+            priority
+          />
+          <span>Jugarr</span>
         </Link>
         <div className="nav-links">
           <Link

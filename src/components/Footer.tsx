@@ -1,11 +1,22 @@
 import Link from "next/link";
+import Image from "next/image";
+import logoImg from "../../public/assets/logo.png";
 
 export default function Footer() {
   return (
     <footer>
       <div className="container footer-inner">
         <div className="footer-brand">
-          <span className="footer-brand-title">Jugarr</span>
+          <Link href="/" className="footer-logo-link">
+            <Image
+              src={logoImg}
+              alt="Jugarr Logo"
+              width={36}
+              height={36}
+              className="footer-logo-img"
+            />
+            <span className="footer-brand-title">Jugarr</span>
+          </Link>
           <p className="footer-brand-desc">
             Connecting the dots of campus potential across India.
           </p>
