@@ -10,10 +10,15 @@ export default function Header() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      setActiveHash(window.location.hash);
+      if (window.location.pathname.startsWith("/blog")) {
+        setActiveHash("/blog");
+      } else {
+        setActiveHash(window.location.hash);
+      }
     };
 
     window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("popstate", handleHashChange);
     handleHashChange(); // Run initially
 
     const sections = ["ecosystem", "how-it-works", "stories"];
@@ -39,6 +44,7 @@ export default function Header() {
 
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("popstate", handleHashChange);
       observers.forEach((obs) => {
         if (obs) obs.observer.unobserve(obs.el);
       });
@@ -61,25 +67,32 @@ export default function Header() {
         </Link>
         <div className="nav-links">
           <Link
-            href="#ecosystem"
+            href="/#ecosystem"
             className={`nav-link ${activeHash === "#ecosystem" ? "active" : ""}`}
             onClick={() => setActiveHash("#ecosystem")}
           >
             Ecosystem
           </Link>
           <Link
-            href="#how-it-works"
+            href="/#how-it-works"
             className={`nav-link ${activeHash === "#how-it-works" ? "active" : ""}`}
             onClick={() => setActiveHash("#how-it-works")}
           >
             How it Works
           </Link>
           <Link
-            href="#stories"
+            href="/#stories"
             className={`nav-link ${activeHash === "#stories" ? "active" : ""}`}
             onClick={() => setActiveHash("#stories")}
           >
             Our Story
+          </Link>
+          <Link
+            href="/blog"
+            className={`nav-link ${activeHash === "/blog" ? "active" : ""}`}
+            onClick={() => setActiveHash("/blog")}
+          >
+            Blog
           </Link>
         </div>
         <button
