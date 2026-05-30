@@ -10,31 +10,33 @@ export default function Hero() {
   };
 
   return (
-    <section className="container hero">
+    <section id="hero" className="container hero">
       <div className="hero-content">
         <div className="editorial-line"></div>
         <h1 className="hero-title">
-          India’s Student Hustle Network
+          <span className="hero-title-segment">India&apos;s Student</span>
+          <br className="hero-title-br" />
+          <span className="hero-title-segment">Campus Marketplace</span>
         </h1>
         <p className="hero-subtitle">
-          Buy, sell, collaborate and earn inside your campus ecosystem.
+          Buy and sell books, notes, gadgets, and furniture. Find internships, offer services, and earn — all within your college campus.
         </p>
         <div className="hero-actions">
           <button className="btn btn-primary" onClick={() => scrollToSection(".cta-section")}>
-            Join Waitlist
+            Join the Waitlist — It&apos;s Free
           </button>
-          <button className="btn btn-secondary" onClick={() => scrollToSection("#ecosystem")}>
-            Explore Ecosystem
+          <button className="btn btn-secondary" onClick={() => scrollToSection("#how-it-works")}>
+            See How It Works
           </button>
         </div>
         <p className="hero-ticker">
-          Notes move. Skills move. Money moves. Students grow.
+          India&apos;s student hustle network — where notes, skills, and money move.
         </p>
       </div>
       <div className="hero-image-container">
         <Image
           src={heroImg}
-          alt="Jugarr student campus network editorial line illustration"
+          alt="Jugarr – India's student-to-student campus marketplace illustration"
           className="hero-image"
           priority
         />

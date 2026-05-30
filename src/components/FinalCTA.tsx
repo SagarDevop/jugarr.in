@@ -63,9 +63,9 @@ export default function FinalCTA() {
   return (
     <section className="cta-section">
       <div className="cta-container">
-        <h2 className="cta-title">Be early to India’s student economy.</h2>
+        <h2 className="cta-title">Join India&apos;s Student Campus Marketplace — Free</h2>
         <p className="cta-desc">
-          Built for ambitious students across India. Join {waitlistCount} others already on the waitlist.
+          {waitlistCount}+ students from colleges across India have already joined. Be among the first to buy, sell, and earn on your campus.
         </p>
         <form className="cta-form-stacked" onSubmit={handleSubmit}>
           <input
@@ -86,13 +86,13 @@ export default function FinalCTA() {
           />
           <textarea
             className="cta-textarea-stacked"
-            placeholder="YOUR MESSAGE / CAMPUS HUSTLE PLANS (OPTIONAL)"
+            placeholder="WHAT WOULD YOU LIKE TO BUY, SELL, OR EARN? (OPTIONAL)"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows={3}
           />
           <button className="cta-btn-stacked" type="submit">
-            Join Waitlist
+            Reserve My Spot — It&apos;s Free
           </button>
         </form>
       </div>

@@ -1,6 +1,33 @@
 import Image from "next/image";
 import diagramImg from "../../public/assets/diagram.png";
 
+const categories = [
+  {
+    label: "Books",
+    desc: "Sell old textbooks or find affordable second-hand books from seniors on your campus.",
+  },
+  {
+    label: "Notes",
+    desc: "Share or buy handwritten and digital study notes for every subject and semester.",
+  },
+  {
+    label: "Furniture",
+    desc: "Buy and sell second-hand hostel furniture — desks, chairs, mattresses, kettles and more.",
+  },
+  {
+    label: "Cycles",
+    desc: "Find affordable used bicycles or sell your campus cycle before you graduate.",
+  },
+  {
+    label: "Gadgets",
+    desc: "Trade second-hand laptops, phones, chargers, and accessories with verified students.",
+  },
+  {
+    label: "Skills",
+    desc: "Offer your design, coding, writing, or tutoring skills and earn from peers who need them.",
+  },
+];
+
 export default function Ecosystem() {
   return (
     <section id="ecosystem" className="ecosystem-section container">
@@ -8,7 +35,7 @@ export default function Ecosystem() {
         <div className="ecosystem-image-container">
           <Image
             src={diagramImg}
-            alt="Jugarr campus ecosystem connection diagram"
+            alt="Jugarr campus marketplace ecosystem — books, notes, furniture, gadgets, internships, skills"
             className="ecosystem-image"
           />
         </div>
@@ -18,13 +45,15 @@ export default function Ecosystem() {
           </h2>
           <div className="editorial-line"></div>
           <p className="ecosystem-desc">
-            Jugarr connects campus needs with campus talent. No middlemen, no outside apps. Just student to student.
+            Jugarr is the student marketplace that connects campus needs with campus talent — no middlemen, no outside apps. Just student-to-student exchange.
           </p>
-          <div className="ecosystem-tags">
-            <span className="ecosystem-tag filled">Sell old stuff</span>
-            <span className="ecosystem-tag yellow-accent">Earn from skills</span>
-            <span className="ecosystem-tag">Find help nearby</span>
-            <span className="ecosystem-tag filled">Collaborate</span>
+          <div className="ecosystem-categories">
+            {categories.map((cat) => (
+              <div key={cat.label} className="ecosystem-category-item">
+                <h3 className="ecosystem-category-label">{cat.label}</h3>
+                <p className="ecosystem-category-desc">{cat.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

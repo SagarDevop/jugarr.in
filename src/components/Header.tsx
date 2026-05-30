@@ -89,7 +89,7 @@ export default function Header() {
             if (el) el.scrollIntoView({ behavior: "smooth" });
           }}
         >
-          Join Waitlist
+          Join Free Waitlist
         </button>
       </div>
     </nav>
