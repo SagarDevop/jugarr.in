@@ -142,5 +142,66 @@ export const blogPosts: BlogPost[] = [
       <p>In massive campuses — especially IITs, NITs, BITS, and large university campus clusters — walking between hostels, canteens, and lecture halls takes a lot of time. Having a bicycle is highly necessary. Finding reliable, affordable <strong>used cycles for college students</strong> is simple if you buy directly from graduating seniors.</p>
       <p>On Jugarr, you can search under the <strong>Furniture</strong> or <strong>Cycles</strong> category to find active campus listings. Connect directly with the seller senior, inspect the mattress or cycle in their hostel wing, pay instantly with no middleman, and roll it straight to your room. It is that direct, convenient, and safe.</p>
     `
+  },
+  {
+    slug: "from-jugaad-to-jugarr",
+    title: "From Jugaad to Jugarr: Building India's Student Marketplace",
+    excerpt: "Discover how Jugarr, inspired by the Indian spirit of Jugaad, is building a structured student marketplace for buying, selling, and earning on campus.",
+    date: "May 31, 2026",
+    author: "Team Jugarr",
+    readTime: "5 min read",
+    category: "CAMPUS LIFE",
+    keywords: ["Jugaad", "spirit of Jugaad", "student marketplace", "campus ecosystem", "circular campus exchange", "buy and sell on campus"],
+    seoTitle: "From Jugaad to Jugarr: Building India's Student Marketplace",
+    seoDescription: "Discover how Jugarr is inspired by the Indian spirit of Jugaad and is building a student marketplace for buying, selling and earning on campus.",
+    content: `
+      <p>India has always been known for one unique concept — <em>Jugaad</em>.</p>
+      <p>Jugaad is the ability to solve problems creatively, make the most of available resources, and find opportunities where others see limitations. Students practice Jugaad every day. They share books with friends, exchange notes before exams, buy second-hand furniture for hostels, borrow cycles, and help each other discover opportunities.</p>
+      <p>Yet most of these activities happen through scattered WhatsApp groups, personal contacts, and informal networks. That's where Jugarr comes in.</p>
+
+      <h2>What Is Jugarr?</h2>
+      <p>Jugarr is a student marketplace and campus ecosystem designed to help students buy, sell, collaborate, and earn within their college communities. Instead of searching through multiple groups, students can access a single platform to connect with fellow students and exchange resources.</p>
+      <p>Inspired by the Indian spirit of Jugaad, we are transforming these everyday campus workarounds into a reliable, structured platform built exclusively for colleges.</p>
+
+      <h2>The Student Economy Is Bigger Than We Think</h2>
+      <p>Every campus has a thriving, micro-student economy that operates under the radar. Every single day, there are:</p>
+      <ul>
+        <li><strong>Books</strong> changing hands every semester.</li>
+        <li><strong>Notes</strong> being shared before exams.</li>
+        <li><strong>Furniture</strong> being sold after graduation.</li>
+        <li><strong>Gadgets</strong> being exchanged between hostel wings.</li>
+        <li><strong>Skills</strong> being offered for freelancing.</li>
+        <li><strong>Opportunities</strong> being discovered in every department.</li>
+      </ul>
+      <p>These activities already exist. The challenge is that they are often unorganized, scattered across hundreds of chat threads, and hard to discover.</p>
+
+      <h2>Bringing Jugaad Into The Digital Age</h2>
+      <p>The spirit of Jugaad is about using available resources wisely. Jugarr applies this exact same philosophy to student life, moving campus commerce from chaotic group threads into a structured student marketplace.</p>
+      <p>Through this campus circular economy, students can easily:</p>
+      <ol>
+        <li>Sell old textbooks.</li>
+        <li>Buy second-hand furniture.</li>
+        <li>Find study resources and exam prep materials.</li>
+        <li>Discover student gigs and campus opportunities.</li>
+        <li>Connect with their campus community directly.</li>
+      </ol>
+      <p>By creating a dedicated student marketplace, Jugarr aims to make campus transactions simpler, safer, and completely free of transaction commissions.</p>
+
+      <h2>Why Student Marketplaces Matter</h2>
+      <p>Student budgets are highly limited. Buying a brand-new textbook, study table, or cycle is not always practical or affordable. Having a campus-first platform helps:</p>
+      <ul>
+        <li><strong>Reduce costs:</strong> Save massive amounts by trading direct.</li>
+        <li><strong>Minimize waste:</strong> Keep items out of landfills through circular reuse.</li>
+        <li><strong>Extend product life:</strong> Pass books and furniture down through student generations.</li>
+        <li><strong>Create opportunities:</strong> Monetize design, coding, or writing skills right inside the dorms.</li>
+        <li><strong>Strengthen campus communities:</strong> Meet in library halls or canteens to exchange items safely.</li>
+      </ul>
+
+      <h2>The Future Of Campus Commerce</h2>
+      <p>As colleges become more connected, student-focused platforms will play an increasingly important role in student life. The future isn't just about buying and selling; it's about creating a sustainable ecosystem where students can support one another, share resources, and grow together.</p>
+      <p>Jugarr is building that ecosystem for the next generation of Indian students, drawing deep inspiration from the Indian spirit of Jugaad to build India's student marketplace.</p>
+
+      <blockquote>Jugaad has always been a part of student life. Jugarr takes that same mindset and transforms it into a structured, campus-first platform where notes, skills, and money move direct.</blockquote>
+    `
   }
 ];
