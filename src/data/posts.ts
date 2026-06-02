@@ -203,5 +203,106 @@ export const blogPosts: BlogPost[] = [
 
       <blockquote>Jugaad has always been a part of student life. Jugarr takes that same mindset and transforms it into a structured, campus-first platform where notes, skills, and money move direct.</blockquote>
     `
+  },
+  {
+    slug: "how-to-earn-money-in-college",
+    title: "How to Earn Money in College: 15 Practical Ways for Students in 2026",
+    excerpt: "Discover 15 practical, campus-first ways college students can earn money in 2026, from freelancing and tutoring to selling old books, notes, and campus resources.",
+    date: "June 02, 2026",
+    author: "Team Jugarr",
+    readTime: "7 min read",
+    category: "EARN",
+    keywords: ["earn money in college", "how to earn money as a student", "student side income", "sell old books", "student freelancing", "college student jobs 2026"],
+    seoTitle: "How to Earn Money in College: 15 Practical Ways for Students in 2026",
+    seoDescription: "Discover 15 practical ways college students can earn money in 2026, from freelancing and internships to selling books, notes, and campus resources.",
+    content: `
+      <p>College life is exciting, but it often comes with financial challenges. From books and study materials to hostel expenses and daily spending, students constantly look for ways to earn extra income.</p>
+      <p>The good news is that earning money in college is easier than ever. Whether you want to cover your expenses, gain experience, or build skills for the future, there are plenty of opportunities available.</p>
+      <p>In this guide, we'll explore 15 practical ways students can earn money while studying.</p>
+
+      <h2>Why Students Should Start Earning Early</h2>
+      <p>Earning money during college isn't just about income. It helps students:</p>
+      <ul>
+        <li>Become financially independent</li>
+        <li>Learn valuable skills</li>
+        <li>Build confidence</li>
+        <li>Gain real-world experience</li>
+        <li>Create professional networks</li>
+        <li>Develop entrepreneurial thinking</li>
+      </ul>
+      <p>Even a small side income can make a big difference over time.</p>
+
+      <h2>15 Practical Ways to Earn Money in College</h2>
+
+      <h3>1. Sell Old Books and Study Materials</h3>
+      <p>Every semester, students buy textbooks, reference books, and study materials that often remain unused after exams. Instead of letting them collect dust, students can sell them to juniors and recover part of their investment. This is one of the simplest ways to earn money while helping fellow students save money.</p>
+
+      <h3>2. Sell Class Notes</h3>
+      <p>Students who maintain organized and high-quality notes can earn by sharing them with others. Many students are willing to pay for well-structured notes, summaries, and revision materials before exams.</p>
+
+      <h3>3. Offer Freelance Services</h3>
+      <p>If you have a skill, you can monetize it. Popular student freelancing services include:</p>
+      <ul>
+        <li>Graphic design</li>
+        <li>Video editing</li>
+        <li>Content writing</li>
+        <li>Social media management</li>
+        <li>Website development</li>
+        <li>UI/UX design</li>
+      </ul>
+      <p>Freelancing allows students to earn while building a portfolio.</p>
+
+      <h3>4. Become a Tutor</h3>
+      <p>Teaching school students or helping juniors with difficult subjects can generate a steady income. Tutoring is one of the most trusted and flexible income sources for college students.</p>
+
+      <h3>5. Manage Social Media Accounts</h3>
+      <p>Many local businesses need help with Instagram, Facebook, and content creation. Students who understand social media trends can earn by managing business accounts.</p>
+
+      <h3>6. Participate in Paid Internships</h3>
+      <p>Internships provide both income and experience. Students should actively look for opportunities related to their field of study. Even a modest stipend can significantly reduce monthly expenses.</p>
+
+      <h3>7. Start Content Creation</h3>
+      <p>Students can create content around college life, productivity, education, career guidance, technology, and student experiences. Platforms like YouTube, Instagram, and LinkedIn can eventually become income sources.</p>
+
+      <h3>8. Sell Unused Furniture</h3>
+      <p>Hostel rooms and rented accommodations often contain furniture that students no longer need. Items such as study tables, chairs, shelves, and storage units can be sold to other students instead of being discarded.</p>
+
+      <h3>9. Offer Photography Services</h3>
+      <p>Students with a good smartphone or camera can earn through event photography, college fests, portrait shoots, and social media content creation.</p>
+
+      <h3>10. Build Websites for Small Businesses</h3>
+      <p>Many small businesses need simple websites but don't know where to start. Students with web development skills can offer affordable solutions and gain valuable experience.</p>
+
+      <h3>11. Sell Digital Products</h3>
+      <p>Digital products can generate income without inventory. Examples include templates, study planners, resume templates, Notion setups, and digital notes.</p>
+
+      <h3>12. Become a Campus Ambassador</h3>
+      <p>Many startups hire students to represent their brand on campus. Responsibilities often include promoting products, organizing events, creating awareness, and driving sign-ups. These roles frequently include incentives and rewards.</p>
+
+      <h3>13. Provide Skill-Based Services</h3>
+      <p>Students can earn through skills such as coding, designing, editing, marketing, and public speaking. Skill-based income often grows faster than traditional part-time jobs.</p>
+
+      <h3>14. Help Seniors and Juniors Connect</h3>
+      <p>Students naturally become part of networks that exchange books, notes, opportunities, and resources. Facilitating these connections can create value and open earning opportunities.</p>
+
+      <h3>15. Use Student Marketplaces</h3>
+      <p>Student marketplaces make it easier to buy, sell, collaborate, and discover opportunities within college communities. Instead of relying on scattered WhatsApp groups, students can connect through dedicated platforms built specifically for campus ecosystems.</p>
+
+      <h2>How Jugarr Helps Students Earn</h2>
+      <p>Jugarr is building India's student marketplace where students can:</p>
+      <ul>
+        <li>Sell old books</li>
+        <li>Share notes</li>
+        <li>Trade gadgets</li>
+        <li>Sell furniture</li>
+        <li>Discover opportunities</li>
+        <li>Connect with fellow students</li>
+      </ul>
+      <p>The goal is to help students unlock the value of resources they already own while building a stronger campus economy.</p>
+
+      <h2>Final Thoughts</h2>
+      <p>College is one of the best times to start earning. Students don't need large investments or years of experience to begin. By using existing skills, resources, and opportunities, anyone can create an additional source of income while studying.</p>
+      <p>The sooner students start learning how to earn, save, and create value, the stronger their future financial foundation becomes. Whether it's selling books, freelancing, tutoring, or participating in student marketplaces, there are more opportunities today than ever before.</p>
+    `
   }
 ];
