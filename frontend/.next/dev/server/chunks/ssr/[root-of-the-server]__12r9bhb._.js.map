@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 13, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Admin/OneDrive/Desktop/jugarr/frontend/src/app/icon.png.mjs%20%28structured%20image%20object%29"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 500, height: 500 }\n"],"names":["src","width","height"],"mappings":";;;;AAAA;;uCACe;IAAEA,KAAAA,uIAAG;IAAEC,OAAO;IAAKC,QAAQ;AAAI"}},
+    {"offset": {"line": 31, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Admin/OneDrive/Desktop/jugarr/frontend/src/app/twitter-image.png.mjs%20%28structured%20image%20object%29"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 1024, height: 1024 }\n"],"names":["src","width","height"],"mappings":";;;;AAAA;;uCACe;IAAEA,KAAAA,mJAAG;IAAEC,OAAO;IAAMC,QAAQ;AAAK"}},
+    {"offset": {"line": 49, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Admin/OneDrive/Desktop/jugarr/frontend/src/app/opengraph-image.png.mjs%20%28structured%20image%20object%29"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 1024, height: 1024 }\n"],"names":["src","width","height"],"mappings":";;;;AAAA;;uCACe;IAAEA,KAAAA,qJAAG;IAAEC,OAAO;IAAMC,QAAQ;AAAK"}}]
+}

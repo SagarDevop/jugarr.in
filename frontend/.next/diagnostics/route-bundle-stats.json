@@ -1,0 +1,57 @@
+[
+  {
+    "route": "/blog",
+    "firstLoadUncompressedJsBytes": 569393,
+    "firstLoadChunkPaths": [
+      ".next\\static\\chunks\\08yb0vyff6txf.js",
+      ".next\\static\\chunks\\0nz2qlxv3r.27.js",
+      ".next\\static\\chunks\\0kit730urw0er.js",
+      ".next\\static\\chunks\\0_qv4k8oexy4q.js",
+      ".next\\static\\chunks\\151by72_bkl~n.js",
+      ".next\\static\\chunks\\0937yqjnv0g5r.js",
+      ".next\\static\\chunks\\0~jd3rjc~en1d.js",
+      ".next\\static\\chunks\\turbopack-0tkfy_vcx24u_.js"
+    ]
+  },
+  {
+    "route": "/",
+    "firstLoadUncompressedJsBytes": 554865,
+    "firstLoadChunkPaths": [
+      ".next\\static\\chunks\\08yb0vyff6txf.js",
+      ".next\\static\\chunks\\0nz2qlxv3r.27.js",
+      ".next\\static\\chunks\\00xku7prh7td2.js",
+      ".next\\static\\chunks\\0_qv4k8oexy4q.js",
+      ".next\\static\\chunks\\151by72_bkl~n.js",
+      ".next\\static\\chunks\\0937yqjnv0g5r.js",
+      ".next\\static\\chunks\\0~jd3rjc~en1d.js",
+      ".next\\static\\chunks\\turbopack-0tkfy_vcx24u_.js"
+    ]
+  },
+  {
+    "route": "/blog/[slug]",
+    "firstLoadUncompressedJsBytes": 537919,
+    "firstLoadChunkPaths": [
+      ".next\\static\\chunks\\08yb0vyff6txf.js",
+      ".next\\static\\chunks\\0nz2qlxv3r.27.js",
+      ".next\\static\\chunks\\0261237nessuf.js",
+      ".next\\static\\chunks\\0_qv4k8oexy4q.js",
+      ".next\\static\\chunks\\151by72_bkl~n.js",
+      ".next\\static\\chunks\\0937yqjnv0g5r.js",
+      ".next\\static\\chunks\\0~jd3rjc~en1d.js",
+      ".next\\static\\chunks\\turbopack-0tkfy_vcx24u_.js"
+    ]
+  },
+  {
+    "route": "/_not-found",
+    "firstLoadUncompressedJsBytes": 514660,
+    "firstLoadChunkPaths": [
+      ".next\\static\\chunks\\08yb0vyff6txf.js",
+      ".next\\static\\chunks\\0nz2qlxv3r.27.js",
+      ".next\\static\\chunks\\0_qv4k8oexy4q.js",
+      ".next\\static\\chunks\\151by72_bkl~n.js",
+      ".next\\static\\chunks\\0937yqjnv0g5r.js",
+      ".next\\static\\chunks\\0~jd3rjc~en1d.js",
+      ".next\\static\\chunks\\turbopack-0tkfy_vcx24u_.js"
+    ]
+  }
+]
