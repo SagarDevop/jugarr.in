@@ -12,7 +12,7 @@ export default function PageLoader() {
     document.body.style.overflow = "hidden";
 
     // Kickoff server-side keep-alive self-pinging loop
-    fetch("/api/ping").catch((err) => console.error("Keep-alive kickoff failed:", err));
+    fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/ping`).catch((err) => console.error("Keep-alive kickoff failed:", err));
 
     // Dynamic, organic progress increment
     const interval = setInterval(() => {
