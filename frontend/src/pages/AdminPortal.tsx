@@ -59,7 +59,7 @@ export default function AdminPortal() {
     setLoading(true);
     setError("");
 
-    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/waitlist/admin/submissions?password=${encodeURIComponent(sessionPassword)}`)
+    fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/waitlist/admin/submissions?password=${encodeURIComponent(sessionPassword)}`)
       .then((res) => {
         if (res.status === 401) {
           throw new Error("Unauthorized. Incorrect admin password.");

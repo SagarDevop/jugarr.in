@@ -25,7 +25,7 @@ export default function FinalCTA() {
       setWaitlistCount(parseInt(saved, 10));
     }
     
-    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/waitlist`)
+    fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/waitlist`)
       .then((res) => res.json())
       .then((data) => {
         if (data && typeof data.count === "number") {
@@ -73,7 +73,7 @@ export default function FinalCTA() {
     try {
       const referredBy = localStorage.getItem("jugarr_referred_by") || "";
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/waitlist`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/waitlist`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

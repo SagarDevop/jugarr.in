@@ -55,7 +55,7 @@ export default function Success() {
     }
 
     const fetchStatus = () => {
-      fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/waitlist/status?email=${encodeURIComponent(email)}`)
+      fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/waitlist/status?email=${encodeURIComponent(email)}`)
         .then((res) => {
           if (!res.ok) {
             throw new Error("Failed to find waitlist details. Make sure your email is registered.");
