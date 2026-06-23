@@ -1,8 +1,28 @@
 import { Router } from "express";
 import connectToDatabase from "../lib/mongoose";
 import Submission from "../models/Submission";
+import { sendReferralEmail } from "../lib/email";
 
 const router = Router();
+
+// GET /api/waitlist/referrer
+router.get("/referrer", async (req, res) => {
+  try {
+    const { code } = req.query;
+    if (!code || typeof code !== "string") {
+      return res.status(400).json({ error: "Referral code is required." });
+    }
+    await connectToDatabase();
+    const referrer = await Submission.findOne({ referralCode: code.trim().toUpperCase() });
+    if (!referrer) {
+      return res.status(404).json({ error: "Referrer not found." });
+    }
+    res.json({ name: referrer.name });
+  } catch (error) {
+    console.error("Error fetching referrer:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
 
 // GET /api/waitlist
 router.get("/", async (req, res) => {
@@ -116,6 +136,10 @@ router.post("/", async (req, res) => {
         await Submission.updateOne(
           { referralCode: inviterCode },
           { $inc: { referralCount: 1 } }
+        );
+        // Send notification email to the referrer asynchronously
+        sendReferralEmail(inviter.email, inviter.name, name.trim()).catch((err) =>
+          console.error("Failed to send referral email:", err)
         );
       }
     }

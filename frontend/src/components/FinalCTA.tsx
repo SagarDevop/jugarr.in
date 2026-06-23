@@ -15,8 +15,35 @@ export default function FinalCTA() {
   const [problemFace, setProblemFace] = useState("");
   const [whyJoin, setWhyJoin] = useState("");
   const [suggestions, setSuggestions] = useState("");
+  const [referredBy, setReferredBy] = useState(() => localStorage.getItem("jugarr_referred_by") || "");
+  const [referrerName, setReferrerName] = useState("");
   
   const [waitlistCount, setWaitlistCount] = useState(70);
+
+  // Fetch referrer name dynamically if referral code exists
+  useEffect(() => {
+    if (!referredBy.trim()) {
+      setReferrerName("");
+      return;
+    }
+    const controller = new AbortController();
+    fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/waitlist/referrer?code=${encodeURIComponent(referredBy.trim().toUpperCase())}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error("Referrer not found");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.name) {
+          setReferrerName(data.name);
+        } else {
+          setReferrerName("");
+        }
+      })
+      .catch(() => {
+        setReferrerName("");
+      });
+    return () => controller.abort();
+  }, [referredBy]);
 
   // Initialize the count from server (with localStorage as fallback)
   useEffect(() => {
@@ -71,8 +98,6 @@ export default function FinalCTA() {
     }
     
     try {
-      const referredBy = localStorage.getItem("jugarr_referred_by") || "";
-
       const response = await fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com"}/api/waitlist`, {
         method: "POST",
         headers: {
@@ -88,7 +113,7 @@ export default function FinalCTA() {
           problemFace,
           whyJoin,
           suggestions,
-          referredBy,
+          referredBy: referredBy.trim(),
         }),
       });
 
@@ -114,6 +139,8 @@ export default function FinalCTA() {
       setProblemFace("");
       setWhyJoin("");
       setSuggestions("");
+      setReferredBy("");
+      setReferrerName("");
       setStep(1);
 
       // Redirect user to the success page with their email
@@ -129,7 +156,13 @@ export default function FinalCTA() {
       <div className="cta-container">
         <h2 className="cta-title">Join India&apos;s Student Campus Marketplace — Free</h2>
         <p className="cta-desc">
-          {waitlistCount}+ students from colleges across India have already joined. Be among the first to buy, sell, and earn on your campus.
+          {referrerName ? (
+            <>
+              ✨ You were invited by <strong>{referrerName}</strong>! Join them and {waitlistCount}+ students from colleges across India.
+            </>
+          ) : (
+            `${waitlistCount}+ students from colleges across India have already joined. Be among the first to buy, sell, and earn on your campus.`
+          )}
         </p>
         
         <form className="cta-form-stacked" onSubmit={handleSubmit}>
@@ -184,6 +217,21 @@ export default function FinalCTA() {
                 onChange={(e) => setPassoutYear(e.target.value)}
                 required
               />
+              <div style={{ width: "100%", textAlign: "left" }}>
+                <input
+                  className="cta-input-stacked"
+                  placeholder="REFERRAL CODE (OPTIONAL)"
+                  type="text"
+                  value={referredBy}
+                  onChange={(e) => setReferredBy(e.target.value.toUpperCase())}
+                  style={{ marginBottom: referrerName ? "8px" : "16px" }}
+                />
+                {referrerName && (
+                  <div className="font-mono" style={{ fontSize: "12px", color: "var(--color-yellow-accent)", fontWeight: "bold", paddingLeft: "4px", marginBottom: "16px" }}>
+                    ✨ Invited by: {referrerName}
+                  </div>
+                )}
+              </div>
               <div 
                 className="cta-checkbox-container" 
                 onClick={() => setJoinWhatsappCommunity(!joinWhatsappCommunity)}
