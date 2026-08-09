@@ -42,7 +42,7 @@ const actions = [
 
 export default function WhatYouCanDo() {
   const [inView, setInView] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     const el = sectionRef.current;

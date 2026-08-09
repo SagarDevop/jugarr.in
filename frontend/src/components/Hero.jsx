@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function Hero() {
   const navigate = useNavigate();
   
-  const scrollToSection = (selector: string) => {
+  const scrollToSection = (selector) => {
     const el = document.querySelector(selector);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };

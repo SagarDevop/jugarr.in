@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Ideology() {
   const [inView, setInView] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     const el = sectionRef.current;

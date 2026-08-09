@@ -1,11 +1,11 @@
 import { useParams, Link } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { blogPosts } from "@/data/posts";
-import { useSEO } from "@/hooks/useSEO";
+import Header from "@/components/Header.jsx";
+import Footer from "@/components/Footer.jsx";
+import { blogPosts } from "@/data/posts.js";
+import { useSEO } from "@/hooks/useSEO.js";
 
 export default function BlogPostPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
   const post = blogPosts.find((p) => p.slug === slug);
 
   useSEO({

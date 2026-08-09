@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { useSEO } from "@/hooks/useSEO";
+import Header from "@/components/Header.jsx";
+import Footer from "@/components/Footer.jsx";
+import { useSEO } from "@/hooks/useSEO.js";
 import rewardsImg from "@/assets/referral_rewards.png";
-
-interface WaitlistStatus {
-  name: string;
-  email: string;
-  referralCode: string;
-  referralCount: number;
-  referredBy: string;
-  rank: number;
-  totalCount: number;
-}
 
 const MOCK_EVENTS = [
   "🎉 Dev from VIT Vellore just unlocked the Limited Edition Hustle T-Shirt! 👕",
@@ -29,7 +19,7 @@ const MOCK_EVENTS = [
 export default function Success() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
-  const [data, setData] = useState<WaitlistStatus | null>(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -41,7 +31,6 @@ export default function Success() {
     }, 3000);
     return () => clearInterval(eventInterval);
   }, []);
-
 
   useSEO({
     title: "Waitlist Leaderboard | Jugarr",

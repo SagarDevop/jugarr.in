@@ -1,21 +1,21 @@
 import { useEffect } from "react";
-import CursorSpotlight from "@/components/CursorSpotlight";
-import PageLoader from "@/components/PageLoader";
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import Ideology from "@/components/Ideology";
-import Problem from "@/components/Problem";
-import Ecosystem from "@/components/Ecosystem";
-import WhatYouCanDo from "@/components/WhatYouCanDo";
-import HowItWorks from "@/components/HowItWorks";
-import Trust from "@/components/Trust";
-import Stories from "@/components/Stories";
-import Team from "@/components/Team";
-import Juggu from "@/components/Juggu";
-import FAQ from "@/components/FAQ";
-import FinalCTA from "@/components/FinalCTA";
-import Footer from "@/components/Footer";
-import { useSEO } from "@/hooks/useSEO";
+import CursorSpotlight from "@/components/CursorSpotlight.jsx";
+import PageLoader from "@/components/PageLoader.jsx";
+import Header from "@/components/Header.jsx";
+import Hero from "@/components/Hero.jsx";
+import Ideology from "@/components/Ideology.jsx";
+import Problem from "@/components/Problem.jsx";
+import Ecosystem from "@/components/Ecosystem.jsx";
+import WhatYouCanDo from "@/components/WhatYouCanDo.jsx";
+import HowItWorks from "@/components/HowItWorks.jsx";
+import Trust from "@/components/Trust.jsx";
+import Stories from "@/components/Stories.jsx";
+import Team from "@/components/Team.jsx";
+import Juggu from "@/components/Juggu.jsx";
+import FAQ from "@/components/FAQ.jsx";
+import FinalCTA from "@/components/FinalCTA.jsx";
+import Footer from "@/components/Footer.jsx";
+import { useSEO } from "@/hooks/useSEO.js";
 
 export default function Home() {
   useEffect(() => {
@@ -76,7 +76,6 @@ export default function Home() {
         <Stories />
         <Team />
         <Juggu />
-        
         
         <FinalCTA />
       </main>

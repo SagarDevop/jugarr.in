@@ -1,11 +1,12 @@
 "use client";
+
 import { useEffect, useRef } from "react";
 
 export default function Problem() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e) => {
       if (!containerRef.current) return;
       const floats = containerRef.current.querySelectorAll(".floating-bubble");
       const mouseX = e.clientX / window.innerWidth;
@@ -17,7 +18,7 @@ export default function Problem() {
         const y = (mouseY - 0.5) * speed;
         const direction = index % 2 === 0 ? "-" : "";
         const baseRotation = 3 + index;
-        (float as HTMLElement).style.transform = `translate(${x}px, ${y}px) rotate(${direction}${baseRotation}deg)`;
+        float.style.transform = `translate(${x}px, ${y}px) rotate(${direction}${baseRotation}deg)`;
       });
     };
 

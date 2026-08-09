@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 export default function CursorSpotlight() {
-  const spotlightRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef(null);
 
   useEffect(() => {
     const spotlight = spotlightRef.current;
@@ -15,7 +15,7 @@ export default function CursorSpotlight() {
     let currentY = -1000;
     let isVisible = false;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
       if (!isVisible) {

@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectToDatabase from "./lib/mongoose";
-import waitlistRoutes from "./routes/waitlist";
-import pingRoutes from "./routes/ping";
+import connectToDatabase from "./lib/mongoose.js";
+import waitlistRoutes from "./routes/waitlist.js";
+import pingRoutes from "./routes/ping.js";
 
 dotenv.config();
 

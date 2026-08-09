@@ -1,18 +1,4 @@
-export interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  readTime: string;
-  category: string;
-  keywords: string[];
-  seoTitle: string;
-  seoDescription: string;
-  content: string;
-}
-
-export const blogPosts: BlogPost[] = [
+export const blogPosts = [
   {
     slug: "5-smart-campus-side-hustles-indian-students",
     title: "5 Smart Campus Side Hustles for Indian College Students",

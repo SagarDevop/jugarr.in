@@ -2,8 +2,8 @@ import { Router } from "express";
 
 const router = Router();
 
-let pingIntervalId: NodeJS.Timeout | undefined = undefined;
-let pingTargetUrl: string | undefined = undefined;
+let pingIntervalId = undefined;
+let pingTargetUrl = undefined;
 
 router.get("/", (req, res) => {
   const host = req.headers.host || "localhost:5000";

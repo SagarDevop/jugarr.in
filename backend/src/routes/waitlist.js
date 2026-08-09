@@ -1,7 +1,7 @@
 import { Router } from "express";
-import connectToDatabase from "../lib/mongoose";
-import Submission from "../models/Submission";
-import { sendReferralEmail } from "../lib/email";
+import connectToDatabase from "../lib/mongoose.js";
+import Submission from "../models/Submission.js";
+import { sendReferralEmail } from "../lib/email.js";
 
 const router = Router();
 
@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
 });
 
 // Helper to generate a unique 6-character uppercase referral code
-async function generateUniqueReferralCode(): Promise<string> {
+async function generateUniqueReferralCode() {
   let code = "";
   let isUnique = false;
   while (!isUnique) {

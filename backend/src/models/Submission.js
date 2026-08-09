@@ -72,6 +72,5 @@ const SubmissionSchema = new mongoose.Schema(
   }
 );
 
-// Fallback to existing model if registered (prevents hot reload issues in ts-node-dev)
 export default mongoose.models.Submission ||
   mongoose.model("Submission", SubmissionSchema);

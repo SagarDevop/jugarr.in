@@ -1,12 +1,6 @@
 import { useEffect } from "react";
 
-interface SEOProps {
-  title?: string;
-  description?: string;
-  keywords?: string[];
-}
-
-export function useSEO({ title, description, keywords }: SEOProps) {
+export function useSEO({ title, description, keywords }) {
   useEffect(() => {
     if (title) {
       document.title = title;

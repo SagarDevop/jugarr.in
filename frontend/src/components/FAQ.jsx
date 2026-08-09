@@ -6,12 +6,12 @@ const faqData = [
   {
     question: "What is Jugarr?",
     answer:
-      "Jugarr is India\u2019s student-to-student campus marketplace where college students can buy, sell, trade, and earn within their own university community. Think of it as a trusted, campus-only marketplace built exclusively for students.",
+      "Jugarr is India’s student-to-student campus marketplace where college students can buy, sell, trade, and earn within their own university community. Think of it as a trusted, campus-only marketplace built exclusively for students.",
   },
   {
     question: "How does Jugarr work?",
     answer:
-      "Students sign up with their college email, browse or list items and services, and connect directly with other verified students on campus. No middlemen, no shipping \u2014 just meet up on campus and exchange.",
+      "Students sign up with their college email, browse or list items and services, and connect directly with other verified students on campus. No middlemen, no shipping — just meet up on campus and exchange.",
   },
   {
     question: "How can students sell old books on Jugarr?",
@@ -41,9 +41,9 @@ const faqData = [
 ];
 
 export default function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState(null);
 
-  const toggle = (index: number) => {
+  const toggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -69,7 +69,7 @@ export default function FAQ() {
                 </span>
                 <span className="faq-question-text font-display">{item.question}</span>
                 <span className="faq-toggle-icon" aria-hidden="true">
-                  {openIndex === index ? "\u2212" : "+"}
+                  {openIndex === index ? "−" : "+"}
                 </span>
               </button>
               <div

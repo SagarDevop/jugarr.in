@@ -1,42 +1,24 @@
 import React, { useEffect, useState } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { useSEO } from "@/hooks/useSEO";
-
-interface SubmissionData {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  joinWhatsappCommunity: boolean;
-  collegeName: string;
-  passoutYear: string;
-  problemFace: string;
-  whyJoin: string;
-  suggestions: string;
-  referralCode: string;
-  referredBy: string;
-  referralCount: number;
-  rank: number;
-  createdAt: string;
-}
+import Header from "@/components/Header.jsx";
+import Footer from "@/components/Footer.jsx";
+import { useSEO } from "@/hooks/useSEO.js";
 
 export default function AdminPortal() {
   const [password, setPassword] = useState("");
   const [sessionPassword, setSessionPassword] = useState(() => sessionStorage.getItem("admin_portal_pwd") || "");
-  const [submissions, setSubmissions] = useState<SubmissionData[]>([]);
+  const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "rank" | "referrals">("newest");
-  const [selectedSubmission, setSelectedSubmission] = useState<SubmissionData | null>(null);
+  const [sortBy, setSortBy] = useState("newest");
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
 
   useSEO({
     title: "Staff Portal | Jugarr Admin",
     description: "Jugarr student waitlist and referral metrics monitoring dashboard.",
   });
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
     if (!password.trim()) {
       alert("Please enter the admin password.");
@@ -82,7 +64,7 @@ export default function AdminPortal() {
         setError(err.message || "An error occurred while loading waitlist.");
         setLoading(false);
         // Clear stored password if it was incorrect
-        if (err.message.includes("Unauthorized")) {
+        if (err.message && err.message.includes("Unauthorized")) {
           sessionStorage.removeItem("admin_portal_pwd");
           setSessionPassword("");
         }
@@ -350,7 +332,7 @@ export default function AdminPortal() {
                       <div className="font-mono" style={{ fontSize: "10px", fontWeight: "bold" }}>SORT BY:</div>
                       <select
                         value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
+                        onChange={(e) => setSortBy(e.target.value)}
                         style={{
                           padding: "12px",
                           border: "1px solid var(--color-primary)",

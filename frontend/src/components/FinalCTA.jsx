@@ -87,7 +87,7 @@ export default function FinalCTA() {
     setStep(2);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Final check for step 1 fields

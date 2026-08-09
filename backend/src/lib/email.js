@@ -15,9 +15,9 @@ const transporter = nodemailer.createTransport({
  * Sends a notification email to the referrer when a new user registers using their code.
  */
 export async function sendReferralEmail(
-  referrerEmail: string,
-  referrerName: string,
-  refereeName: string
+  referrerEmail,
+  referrerName,
+  refereeName
 ) {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
