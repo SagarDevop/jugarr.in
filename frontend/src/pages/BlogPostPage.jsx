@@ -1,20 +1,56 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
-import { blogPosts } from "@/data/posts.js";
+import { blogPosts as fallbackPosts } from "@/data/posts.js";
 import { useSEO } from "@/hooks/useSEO.js";
+
+const API_BASE = import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com";
 
 export default function BlogPostPage() {
   const { slug } = useParams();
-  const post = blogPosts.find((p) => p.slug === slug);
+  const fallbackPost = fallbackPosts.find((p) => p.slug === slug);
+  
+  const [post, setPost] = useState(fallbackPost || null);
+  const [allPosts, setAllPosts] = useState(fallbackPosts);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch single article
+    fetch(`${API_BASE}/api/blogs/${slug}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Article not found");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.post) {
+          setPost(data.post);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.warn("Could not fetch article from API, fallback used:", err);
+        setLoading(false);
+      });
+
+    // Fetch all articles for related posts
+    fetch(`${API_BASE}/api/blogs`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && Array.isArray(data.posts) && data.posts.length > 0) {
+          setAllPosts(data.posts);
+        }
+      })
+      .catch(() => {});
+  }, [slug]);
 
   useSEO({
-    title: post ? `${post.seoTitle} | Jugarr Blog` : "Article Not Found | Jugarr Blog",
-    description: post?.seoDescription || "Read article on Jugarr student marketplace blog.",
+    title: post ? `${post.seoTitle || post.title} | Jugarr Blog` : "Article Not Found | Jugarr Blog",
+    description: post?.seoDescription || post?.excerpt || "Read article on Jugarr student marketplace blog.",
     keywords: post?.keywords || [],
   });
 
-  if (!post) {
+  if (!post && !loading) {
     return (
       <>
         <Header />
@@ -36,8 +72,24 @@ export default function BlogPostPage() {
     );
   }
 
+  if (!post) {
+    return (
+      <>
+        <Header />
+        <main>
+          <section className="blog-post-section" style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="container" style={{ textAlign: "center" }}>
+              <p className="font-mono text-outline" style={{ fontSize: "14px" }}>LOADING ARTICLE...</p>
+            </div>
+          </section>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   // Get related posts (exclude current)
-  const relatedPosts = blogPosts
+  const relatedPosts = allPosts
     .filter((p) => p.slug !== post.slug)
     .slice(0, 2);
 
@@ -46,11 +98,11 @@ export default function BlogPostPage() {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title,
-    "description": post.seoDescription,
-    "datePublished": new Date(post.date).toISOString(),
+    "description": post.seoDescription || post.excerpt,
+    "datePublished": post.date,
     "author": {
       "@type": "Organization",
-      "name": "Jugarr",
+      "name": post.author || "Jugarr",
       "url": "https://jugarr.in",
     },
     "publisher": {
@@ -91,13 +143,13 @@ export default function BlogPostPage() {
               
               <div className="blog-post-meta">
                 <div className="blog-post-meta-item">
-                  BY <strong>{post.author}</strong>
+                  BY <strong>{post.author || "Team Jugarr"}</strong>
                 </div>
                 <div className="blog-post-meta-item">
                   PUBLISHED <strong>{post.date}</strong>
                 </div>
                 <div className="blog-post-meta-item">
-                  READ TIME <strong>{post.readTime}</strong>
+                  READ TIME <strong>{post.readTime || "5 min read"}</strong>
                 </div>
               </div>
             </article>
@@ -151,8 +203,10 @@ export default function BlogPostPage() {
                           {p.readTime}
                         </span>
                       </div>
+
                       <h4 className="blog-card-title">{p.title}</h4>
                       <p className="blog-card-excerpt">{p.excerpt}</p>
+
                       <div className="blog-card-footer">
                         <span className="blog-card-date">{p.date}</span>
                         <span className="blog-card-link font-mono">

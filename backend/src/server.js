@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectToDatabase from "./lib/mongoose.js";
 import waitlistRoutes from "./routes/waitlist.js";
 import pingRoutes from "./routes/ping.js";
+import blogRoutes from "./routes/blog.js";
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use(express.json());
 // API endpoints
 app.use("/api/ping", pingRoutes);
 app.use("/api/waitlist", waitlistRoutes);
+app.use("/api/blogs", blogRoutes);
 
 // Root test route
 app.get("/", (req, res) => {

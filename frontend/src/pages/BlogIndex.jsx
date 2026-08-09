@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
-import { blogPosts } from "@/data/posts.js";
+import { blogPosts as fallbackPosts } from "@/data/posts.js";
 import { useSEO } from "@/hooks/useSEO.js";
 
 const categories = ["ALL", "EARN", "SELL", "CAMPUS LIFE"];
+const API_BASE = import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com";
 
 export default function BlogIndex() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
+  const [posts, setPosts] = useState(fallbackPosts);
+  const [loading, setLoading] = useState(true);
 
   useSEO({
     title: "Blog | Jugarr – Student Marketplace Guides & Stories",
@@ -17,15 +20,33 @@ export default function BlogIndex() {
     keywords: ["Jugarr blog", "student hustle journal", "college side income guides", "buy and sell textbooks", "campus circular economy"],
   });
 
-  const filteredPosts = blogPosts.filter((post) => {
+  useEffect(() => {
+    fetch(`${API_BASE}/api/blogs`)
+      .then((res) => {
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.posts) && data.posts.length > 0) {
+          setPosts(data.posts);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.warn("Could not fetch blogs from API, using fallback static data:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.keywords.some((k) => k.toLowerCase().includes(searchQuery.toLowerCase()));
+      (Array.isArray(post.keywords) && post.keywords.some((k) => k.toLowerCase().includes(searchQuery.toLowerCase())));
 
     const matchesCategory =
       activeCategory === "ALL" ||
-      post.category.toUpperCase() === activeCategory.toUpperCase();
+      (post.category && post.category.toUpperCase() === activeCategory.toUpperCase());
 
     return matchesSearch && matchesCategory;
   });
