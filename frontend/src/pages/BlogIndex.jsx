@@ -4,11 +4,12 @@ import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
 import { blogPosts as fallbackPosts } from "@/data/posts.js";
 import { useSEO } from "@/hooks/useSEO.js";
+import { getApiBaseUrl } from "@/lib/api.js";
 
 const categories = ["ALL", "EARN", "SELL", "CAMPUS LIFE"];
-const API_BASE = import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com";
 
 export default function BlogIndex() {
+  const API_BASE = getApiBaseUrl();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [posts, setPosts] = useState(fallbackPosts);

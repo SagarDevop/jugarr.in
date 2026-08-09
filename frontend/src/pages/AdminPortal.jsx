@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
 import { useSEO } from "@/hooks/useSEO.js";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com";
+import { getApiBaseUrl } from "@/lib/api.js";
 
 export default function AdminPortal() {
+  const API_BASE = getApiBaseUrl();
   const [password, setPassword] = useState("");
   const [sessionPassword, setSessionPassword] = useState(() => sessionStorage.getItem("admin_portal_pwd") || "");
   const [activeTab, setActiveTab] = useState("blogs"); // "blogs" | "waitlist"

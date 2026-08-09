@@ -4,10 +4,10 @@ import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
 import { blogPosts as fallbackPosts } from "@/data/posts.js";
 import { useSEO } from "@/hooks/useSEO.js";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com";
+import { getApiBaseUrl } from "@/lib/api.js";
 
 export default function BlogPostPage() {
+  const API_BASE = getApiBaseUrl();
   const { slug } = useParams();
   const fallbackPost = fallbackPosts.find((p) => p.slug === slug);
   
