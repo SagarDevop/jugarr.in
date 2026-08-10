@@ -12,34 +12,51 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Enable CORS for frontend
-const allowedOrigins = [
+const defaultAllowedOrigins = [
+  "https://jugarr.in",
+  "https://www.jugarr.in",
   "https://jugarr-in.vercel.app",
   "http://localhost:3000",
   "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:5173",
 ];
 
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
+const parseEnvOrigins = (envVar) => {
+  if (!envVar) return [];
+  return envVar
+    .split(",")
+    .map((url) => url.trim().replace(/\/$/, "").toLowerCase())
+    .filter(Boolean);
+};
+
+const allowedOrigins = Array.from(
+  new Set([
+    ...defaultAllowedOrigins.map((u) => u.toLowerCase()),
+    ...parseEnvOrigins(process.env.FRONTEND_URL),
+    ...parseEnvOrigins(process.env.ALLOWED_ORIGINS),
+  ])
+);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like server-to-server or postman)
+      // Allow requests with no origin (like server-to-server, mobile apps, or postman)
       if (!origin) return callback(null, true);
 
       // Normalize origin by stripping trailing slash
-      const normalizedOrigin = origin.endsWith("/") ? origin.slice(0, -1) : origin;
-      const isAllowed = allowedOrigins.some((allowed) => {
-        const normalizedAllowed = allowed.endsWith("/") ? allowed.slice(0, -1) : allowed;
-        return normalizedAllowed.toLowerCase() === normalizedOrigin.toLowerCase();
-      });
+      const normalizedOrigin = origin.endsWith("/") ? origin.slice(0, -1).toLowerCase() : origin.toLowerCase();
+      const isAllowed =
+        allowedOrigins.some((allowed) => allowed === normalizedOrigin) ||
+        normalizedOrigin.endsWith(".jugarr.in") ||
+        normalizedOrigin.endsWith(".vercel.app");
 
       if (isAllowed) {
         callback(null, true);
       } else {
         console.warn(`CORS blocked for origin: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
+        callback(null, false);
       }
     },
     credentials: true,
