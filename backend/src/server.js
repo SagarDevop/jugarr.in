@@ -6,6 +6,7 @@ import waitlistRoutes from "./routes/waitlist.js";
 import pingRoutes from "./routes/ping.js";
 import blogRoutes from "./routes/blog.js";
 import adminRoutes from "./routes/admin.js";
+import sitemapRoutes from "./routes/sitemap.js";
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.use("/api/ping", pingRoutes);
 app.use("/api/waitlist", waitlistRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/sitemap.xml", sitemapRoutes);
 
 // Root test route
 app.get("/", (req, res) => {
