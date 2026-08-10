@@ -40,7 +40,7 @@ export default function Team() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.linkedin.com/in/sagar-singh-rajawat-619711399"
+                  href="https://www.linkedin.com/in/sagardevop/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="member-social-link"
@@ -97,7 +97,7 @@ export default function Team() {
                   </svg>
                 </a>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/prince-mishra-09"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="member-social-link"
