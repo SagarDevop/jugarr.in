@@ -6,7 +6,7 @@ import { blogPosts as fallbackPosts } from "@/data/posts.js";
 import { useSEO } from "@/hooks/useSEO.js";
 import { getApiBaseUrl } from "@/lib/api.js";
 
-const categories = ["ALL", "EARN", "SELL", "CAMPUS LIFE"];
+const categories = ["ALL", "EARN", "SELL", "CAMPUS LIFE", "CAREER"];
 
 export default function BlogIndex() {
   const API_BASE = getApiBaseUrl();
