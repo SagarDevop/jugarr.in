@@ -565,7 +565,7 @@ export default function AdminPortal() {
                         cursor: "pointer",
                       }}
                     >
-                      <option value="ALL">ALL CATEGORIES</option>
+                      <option value="ALL">ALL CATEGORIES </option>
                       <option value="EARN">EARN</option>
                       <option value="SELL">SELL</option>
                       <option value="CAMPUS LIFE">CAMPUS LIFE</option>
