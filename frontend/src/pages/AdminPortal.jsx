@@ -566,7 +566,7 @@ export default function AdminPortal() {
                       }}
                     >
                       <option value="ALL">ALL CATEGORIES </option>
-                      <option value="EARN">EARN</option>
+                      <option value="EARN">EARN </option>
                       <option value="SELL">SELL</option>
                       <option value="CAMPUS LIFE">CAMPUS LIFE</option>
                       <option value="CAREER">CAREER</option>
