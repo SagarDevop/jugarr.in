@@ -9,5 +9,5 @@ export const getApiBaseUrl = () => {
     }
     return "http://localhost:5000";
   }
-  return import.meta.env.VITE_API_URL || "https://jugarr-in.onrender.com";
+  return import.meta.env.VITE_API_URL || "https://jugarr-in-zytm.onrender.com";
 };
