@@ -177,7 +177,7 @@ router.post("/", async (req, res) => {
 // GET /api/waitlist/admin/submissions
 router.get("/admin/submissions", async (req, res) => {
   try {
-    const password = req.query.password || req.headers["x-admin-password"];
+    const password = req.headers["x-admin-password"];
     const expectedPassword = process.env.ADMIN_PASSWORD || "jugarradmin123";
 
     if (!password || password !== expectedPassword) {

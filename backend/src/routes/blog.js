@@ -238,7 +238,7 @@ const INITIAL_BLOG_POSTS = [
 
 // Admin auth middleware helper
 function checkAdminAuth(req) {
-  const password = req.query.password || req.headers["x-admin-password"];
+  const password = req.headers["x-admin-password"] || req.body?.password;
   const expectedPassword = process.env.ADMIN_PASSWORD || "jugarradmin123";
   return password && password === expectedPassword;
 }
@@ -259,10 +259,10 @@ router.get("/", async (req, res) => {
     await connectToDatabase();
     await seedInitialBlogsIfEmpty();
 
-    const { category, search, includeDrafts, password } = req.query;
+    const { category, search, includeDrafts } = req.query;
 
     let query = {};
-    const isAdmin = checkAdminAuth({ query: { password }, headers: req.headers });
+    const isAdmin = checkAdminAuth(req);
 
     if (!isAdmin || includeDrafts !== "true") {
       query.published = true;

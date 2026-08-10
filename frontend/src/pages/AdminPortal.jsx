@@ -53,14 +53,29 @@ export default function AdminPortal() {
     description: "Jugarr student waitlist and blog post publishing dashboard.",
   });
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!password.trim()) {
       alert("Please enter the admin password.");
       return;
     }
-    sessionStorage.setItem("admin_portal_pwd", password);
-    setSessionPassword(password);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Invalid password");
+      }
+
+      sessionStorage.setItem("admin_portal_pwd", password);
+      setSessionPassword(password);
+    } catch (err) {
+      alert("Unauthorized. Incorrect admin password.");
+    }
   };
 
   const handleLogout = () => {
@@ -79,7 +94,9 @@ export default function AdminPortal() {
     setLoading(true);
     setError("");
 
-    fetch(`${API_BASE}/api/waitlist/admin/submissions?password=${encodeURIComponent(sessionPassword)}`)
+    fetch(`${API_BASE}/api/waitlist/admin/submissions`, {
+      headers: { "x-admin-password": sessionPassword }
+    })
       .then((res) => {
         if (res.status === 401) {
           throw new Error("Unauthorized. Incorrect admin password.");
@@ -115,8 +132,13 @@ export default function AdminPortal() {
     setBlogsLoading(true);
     setBlogError("");
 
-    fetch(`${API_BASE}/api/blogs?includeDrafts=true&password=${encodeURIComponent(sessionPassword)}`)
+    fetch(`${API_BASE}/api/blogs?includeDrafts=true`, {
+      headers: { "x-admin-password": sessionPassword }
+    })
       .then((res) => {
+        if (res.status === 401) {
+          throw new Error("Unauthorized. Incorrect admin password.");
+        }
         if (!res.ok) {
           throw new Error("Failed to fetch blog posts from backend.");
         }
@@ -132,6 +154,10 @@ export default function AdminPortal() {
         console.error("Blog fetch error:", err);
         setBlogError(err.message || "Could not load blog posts.");
         setBlogsLoading(false);
+        if (err.message && err.message.includes("Unauthorized")) {
+          sessionStorage.removeItem("admin_portal_pwd");
+          setSessionPassword("");
+        }
       });
   };
 
@@ -199,8 +225,8 @@ export default function AdminPortal() {
     setSavingBlog(true);
 
     const url = editingBlogId
-      ? `${API_BASE}/api/blogs/${editingBlogId}?password=${encodeURIComponent(sessionPassword)}`
-      : `${API_BASE}/api/blogs?password=${encodeURIComponent(sessionPassword)}`;
+      ? `${API_BASE}/api/blogs/${editingBlogId}`
+      : `${API_BASE}/api/blogs`;
 
     const method = editingBlogId ? "PUT" : "POST";
 
@@ -208,6 +234,7 @@ export default function AdminPortal() {
       method,
       headers: {
         "Content-Type": "application/json",
+        "x-admin-password": sessionPassword,
       },
       body: JSON.stringify({
         ...blogFormData,
@@ -236,9 +263,12 @@ export default function AdminPortal() {
 
   // Toggle Published State
   const handleTogglePublish = (blog) => {
-    fetch(`${API_BASE}/api/blogs/${blog._id}?password=${encodeURIComponent(sessionPassword)}`, {
+    fetch(`${API_BASE}/api/blogs/${blog._id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "x-admin-password": sessionPassword,
+      },
       body: JSON.stringify({ published: !blog.published }),
     })
       .then((res) => res.json())
@@ -250,8 +280,9 @@ export default function AdminPortal() {
   const handleDeleteBlog = (blog) => {
     if (!window.confirm(`Are you sure you want to delete "${blog.title}"?`)) return;
 
-    fetch(`${API_BASE}/api/blogs/${blog._id}?password=${encodeURIComponent(sessionPassword)}`, {
+    fetch(`${API_BASE}/api/blogs/${blog._id}`, {
       method: "DELETE",
+      headers: { "x-admin-password": sessionPassword },
     })
       .then((res) => res.json())
       .then(() => fetchBlogs())
