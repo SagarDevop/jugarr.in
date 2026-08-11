@@ -1,24 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImg from "@/assets/logo.png";
 
 export default function Header() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeHash, setActiveHash] = useState("");
 
   useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.pathname.startsWith("/blog")) {
-        setActiveHash("/blog");
-      } else {
-        setActiveHash(window.location.hash);
+    if (location.pathname.startsWith("/blog")) {
+      setActiveHash("/blog");
+    } else if (location.hash) {
+      setActiveHash(location.hash);
+    } else if (location.pathname === "/") {
+      if (window.scrollY < 100) {
+        setActiveHash("");
       }
-    };
+    }
+  }, [location.pathname, location.hash]);
 
-    window.addEventListener("hashchange", handleHashChange);
-    window.addEventListener("popstate", handleHashChange);
-    handleHashChange(); // Run initially
+  useEffect(() => {
+    if (location.pathname !== "/") return;
 
     const sections = ["ecosystem", "how-it-works", "stories"];
     const observers = sections.map((id) => {
@@ -42,18 +46,25 @@ export default function Header() {
     });
 
     return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-      window.removeEventListener("popstate", handleHashChange);
       observers.forEach((obs) => {
         if (obs) obs.observer.unobserve(obs.el);
       });
     };
-  }, []);
+  }, [location.pathname]);
+
+  const handleJoinClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/#cta");
+    } else {
+      const el = document.getElementById("cta") || document.querySelector(".cta-section");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <nav className="navbar">
       <div className="container navbar-inner">
-        <Link to="/" className="logo" onClick={() => setActiveHash("")}>
+        <Link to="/" className="logo">
           <img
             src={logoImg}
             alt="Jugarr Logo"
@@ -67,39 +78,29 @@ export default function Header() {
           <Link
             to="/#ecosystem"
             className={`nav-link ${activeHash === "#ecosystem" ? "active" : ""}`}
-            onClick={() => setActiveHash("#ecosystem")}
           >
             Ecosystem
           </Link>
           <Link
             to="/#how-it-works"
             className={`nav-link ${activeHash === "#how-it-works" ? "active" : ""}`}
-            onClick={() => setActiveHash("#how-it-works")}
           >
             How it Works
           </Link>
           <Link
             to="/#stories"
             className={`nav-link ${activeHash === "#stories" ? "active" : ""}`}
-            onClick={() => setActiveHash("#stories")}
           >
             Our Story
           </Link>
           <Link
             to="/blog"
             className={`nav-link ${activeHash === "/blog" ? "active" : ""}`}
-            onClick={() => setActiveHash("/blog")}
           >
             Blog
           </Link>
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            const el = document.querySelector(".cta-section");
-            if (el) el.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
+        <button className="btn btn-primary" onClick={handleJoinClick}>
           Join Free Waitlist
         </button>
       </div>

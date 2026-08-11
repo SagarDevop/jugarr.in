@@ -7,7 +7,7 @@ import Success from "./pages/Success.jsx";
 import AdminPortal from "./pages/AdminPortal.jsx";
 
 export default function App() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
     // Add light theme class on load
@@ -15,9 +15,30 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Scroll to top on page change
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (hash) {
+      const targetId = hash.replace("#", "");
+      const scrollToElement = () => {
+        const el =
+          document.getElementById(targetId) ||
+          (targetId === "cta" ? document.querySelector(".cta-section") : null);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+          return true;
+        }
+        return false;
+      };
+
+      if (!scrollToElement()) {
+        const timer = setTimeout(() => {
+          scrollToElement();
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      // Scroll to top on page change if no hash
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
 
   return (
     <Routes>

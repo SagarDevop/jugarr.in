@@ -173,7 +173,7 @@ export default function BlogPostPage() {
                   </p>
                   <div>
                     <Link
-                      to="/#hero"
+                      to="/#cta"
                       className="btn btn-primary"
                       style={{ textDecoration: "none" }}
                     >

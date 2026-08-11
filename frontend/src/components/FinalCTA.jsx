@@ -152,7 +152,7 @@ export default function FinalCTA() {
   };
 
   return (
-    <section className="cta-section">
+    <section id="cta" className="cta-section">
       <div className="cta-container">
         <h2 className="cta-title">Join India&apos;s Student Campus Marketplace — Free</h2>
         <p className="cta-desc">
