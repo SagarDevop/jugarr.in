@@ -51,6 +51,9 @@ export default function JobDetailPage() {
     description: job
       ? `Apply for ${job.title} (${job.type}) at Jugarr in ${job.location}. Shape the future of campus commerce in India.`
       : "Apply for careers and internships at Jugarr.",
+    canonicalUrl: `https://jugarr.in/careers/${slug}`,
+    ogType: "website",
+    robots: job ? "index, follow" : "noindex, follow",
   });
 
   const handleFileChange = (e) => {
@@ -177,13 +180,19 @@ export default function JobDetailPage() {
     );
   }
 
-  // JSON-LD Schema for Google for Jobs
+  // JSON-LD Schema for Google for Jobs (JobPosting)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     "title": job.title,
     "description": job.description,
-    "datePosted": job.postedAt || job.createdAt,
+    "url": `https://jugarr.in/careers/${job.slug}`,
+    "identifier": {
+      "@type": "PropertyValue",
+      "name": "Jugarr",
+      "value": job._id || job.slug,
+    },
+    "datePosted": new Date(job.postedAt || job.createdAt).toISOString(),
     "employmentType":
       job.type === "Full-time"
         ? "FULL_TIME"
@@ -196,7 +205,7 @@ export default function JobDetailPage() {
       "@type": "Organization",
       "name": "Jugarr",
       "sameAs": "https://jugarr.in",
-      "logo": "https://jugarr.in/assets/logo.png",
+      "logo": "https://jugarr.in/icon.png",
     },
     "jobLocation": {
       "@type": "Place",
@@ -205,6 +214,10 @@ export default function JobDetailPage() {
         "addressLocality": job.location,
         "addressCountry": "IN",
       },
+    },
+    "applicantLocationRequirements": {
+      "@type": "Country",
+      "name": "India",
     },
   };
 

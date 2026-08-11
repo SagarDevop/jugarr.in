@@ -27,6 +27,8 @@ export default function CareersIndex() {
       "tech internships college",
       "campus ambassador roles",
     ],
+    canonicalUrl: "https://jugarr.in/careers",
+    robots: "index, follow",
   });
 
   useEffect(() => {

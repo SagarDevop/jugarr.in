@@ -1,8 +1,16 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.jugarr.in" }],
+      "destination": "https://jugarr.in/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "https://jugarr-in.onrender.com/sitemap.xml"
+      "destination": "https://jugarr-in-zytm.onrender.com/sitemap.xml"
     },
     {
       "source": "/(.*)",

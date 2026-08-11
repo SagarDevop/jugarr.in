@@ -48,6 +48,10 @@ export default function BlogPostPage() {
     title: post ? `${post.seoTitle || post.title} | Jugarr Blog` : "Article Not Found | Jugarr Blog",
     description: post?.seoDescription || post?.excerpt || "Read article on Jugarr student marketplace blog.",
     keywords: post?.keywords || [],
+    canonicalUrl: `https://jugarr.in/blog/${slug}`,
+    ogType: post ? "article" : "website",
+    ogImage: post?.coverImage || undefined,
+    robots: "index, follow",
   });
 
   if (!post && !loading) {
@@ -93,24 +97,28 @@ export default function BlogPostPage() {
     .filter((p) => p.slug !== post.slug)
     .slice(0, 2);
 
-  // Article JSON-LD Schema
+  // Article JSON-LD Schema (BlogPosting)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": post.title,
+    "headline": post.seoTitle || post.title,
     "description": post.seoDescription || post.excerpt,
-    "datePublished": post.date,
+    "url": `https://jugarr.in/blog/${post.slug}`,
+    "datePublished": post.createdAt || post.date,
+    "dateModified": post.updatedAt || post.createdAt || post.date,
+    "keywords": Array.isArray(post.keywords) ? post.keywords.join(", ") : undefined,
     "author": {
       "@type": "Organization",
-      "name": post.author || "Jugarr",
+      "name": post.author || "Team Jugarr",
       "url": "https://jugarr.in",
     },
     "publisher": {
       "@type": "Organization",
       "name": "Jugarr",
+      "url": "https://jugarr.in",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://jugarr.in/assets/logo.png",
+        "url": "https://jugarr.in/icon.png",
       },
     },
     "mainEntityOfPage": {
@@ -119,11 +127,14 @@ export default function BlogPostPage() {
     },
   };
 
+  // Remove undefined keys from JSON-LD to keep output clean
+  const cleanJsonLd = JSON.parse(JSON.stringify(jsonLd, (k, v) => v === undefined ? undefined : v));
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(cleanJsonLd) }}
       />
       <Header />
       <main>

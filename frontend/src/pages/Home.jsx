@@ -58,6 +58,8 @@ export default function Home() {
       "student network",
       "circular economy",
     ],
+    canonicalUrl: "https://jugarr.in/",
+    robots: "index, follow",
   });
 
   return (

@@ -19,6 +19,8 @@ export default function BlogIndex() {
     title: "Blog | Jugarr – Student Marketplace Guides & Stories",
     description: "Learn how to buy, sell, earn, and build opportunities inside your campus community. Insights and guides written by students, for students.",
     keywords: ["Jugarr blog", "student hustle journal", "college side income guides", "buy and sell textbooks", "campus circular economy"],
+    canonicalUrl: "https://jugarr.in/blog",
+    robots: "index, follow",
   });
 
   useEffect(() => {
