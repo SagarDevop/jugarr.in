@@ -3,6 +3,8 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import BlogIndex from "./pages/BlogIndex.jsx";
 import BlogPostPage from "./pages/BlogPostPage.jsx";
+import CareersIndex from "./pages/CareersIndex.jsx";
+import JobDetailPage from "./pages/JobDetailPage.jsx";
 import Success from "./pages/Success.jsx";
 import AdminPortal from "./pages/AdminPortal.jsx";
 
@@ -45,6 +47,8 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/blog" element={<BlogIndex />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
+      <Route path="/careers" element={<CareersIndex />} />
+      <Route path="/careers/:slug" element={<JobDetailPage />} />
       <Route path="/success" element={<Success />} />
       <Route path="/admin" element={<AdminPortal />} />
     </Routes>

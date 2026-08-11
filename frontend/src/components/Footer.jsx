@@ -78,6 +78,9 @@ export default function Footer() {
           </div>
           <div className="footer-col">
             <span className="footer-col-title">Join Us</span>
+            <Link to="/careers" className="footer-link">
+              Careers
+            </Link>
             <Link to="#" className="footer-link">
               Campus Ambassadors
             </Link>

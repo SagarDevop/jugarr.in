@@ -8,6 +8,8 @@ import blogRoutes from "./routes/blog.js";
 import adminRoutes from "./routes/admin.js";
 import sitemapRoutes from "./routes/sitemap.js";
 
+import careersRoutes from "./routes/careers.js";
+
 dotenv.config();
 
 const app = express();
@@ -72,6 +74,7 @@ app.use("/api/ping", pingRoutes);
 app.use("/api/waitlist", waitlistRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", careersRoutes);
 app.use("/sitemap.xml", sitemapRoutes);
 
 // Root test route

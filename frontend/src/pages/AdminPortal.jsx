@@ -83,8 +83,261 @@ export default function AdminPortal() {
     setSessionPassword("");
     setSubmissions([]);
     setBlogs([]);
+    setAdminJobs([]);
+    setAdminApplications([]);
     setError("");
     setBlogError("");
+    setJobsError("");
+    setAppsError("");
+  };
+
+  // Careers & Jobs Management State
+  const [adminJobs, setAdminJobs] = useState([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
+  const [jobsError, setJobsError] = useState("");
+  const [jobSubTab, setJobSubTab] = useState("jobs"); // "jobs" | "applications"
+  const [selectedJobIdForApps, setSelectedJobIdForApps] = useState("ALL");
+
+  // Applications State
+  const [adminApplications, setAdminApplications] = useState([]);
+  const [appsLoading, setAppsLoading] = useState(false);
+  const [appsError, setAppsError] = useState("");
+  const [appStatusFilter, setAppStatusFilter] = useState("ALL");
+  const [selectedAppDetail, setSelectedAppDetail] = useState(null);
+
+  // Job Modal State
+  const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+  const [editingJobId, setEditingJobId] = useState(null);
+  const [savingJob, setSavingJob] = useState(false);
+
+  const initialJobFormState = {
+    title: "",
+    slug: "",
+    department: "Tech",
+    location: "Remote",
+    type: "Full-time",
+    description: "",
+    responsibilities: "",
+    requirements: "",
+    status: "open",
+  };
+  const [jobFormData, setJobFormData] = useState(initialJobFormState);
+
+  // Fetch Careers Jobs
+  const fetchAdminJobs = () => {
+    if (!sessionPassword) return;
+    setJobsLoading(true);
+    setJobsError("");
+
+    fetch(`${API_BASE}/api/admin/jobs`, {
+      headers: { "x-admin-password": sessionPassword },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load jobs.");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.jobs)) {
+          setAdminJobs(data.jobs);
+        }
+        setJobsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Jobs fetch error:", err);
+        setJobsError(err.message || "Could not load jobs.");
+        setJobsLoading(false);
+      });
+  };
+
+  // Fetch Applications
+  const fetchAdminApplications = (jobId = "ALL") => {
+    if (!sessionPassword) return;
+    setAppsLoading(true);
+    setAppsError("");
+
+    const url =
+      jobId && jobId !== "ALL"
+        ? `${API_BASE}/api/admin/jobs/${jobId}/applications`
+        : `${API_BASE}/api/admin/applications`;
+
+    fetch(url, {
+      headers: { "x-admin-password": sessionPassword },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load applications.");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.applications)) {
+          setAdminApplications(data.applications);
+        }
+        setAppsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Applications fetch error:", err);
+        setAppsError(err.message || "Could not load applications.");
+        setAppsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (sessionPassword && activeTab === "careers") {
+      fetchAdminJobs();
+      fetchAdminApplications(selectedJobIdForApps);
+    }
+  }, [sessionPassword, activeTab, selectedJobIdForApps]);
+
+  const handleOpenCreateJobModal = () => {
+    setEditingJobId(null);
+    setJobFormData(initialJobFormState);
+    setIsJobModalOpen(true);
+  };
+
+  const handleOpenEditJobModal = (job) => {
+    setEditingJobId(job._id);
+    setJobFormData({
+      title: job.title || "",
+      slug: job.slug || "",
+      department: job.department || "Tech",
+      location: job.location || "Remote",
+      type: job.type || "Full-time",
+      description: job.description || "",
+      responsibilities: Array.isArray(job.responsibilities)
+        ? job.responsibilities.join("\n")
+        : job.responsibilities || "",
+      requirements: Array.isArray(job.requirements)
+        ? job.requirements.join("\n")
+        : job.requirements || "",
+      status: job.status || "open",
+    });
+    setIsJobModalOpen(true);
+  };
+
+  const handleSaveJob = (e) => {
+    e.preventDefault();
+    if (!jobFormData.title.trim() || !jobFormData.description.trim() || !jobFormData.department.trim()) {
+      alert("Title, Department, and Description are required.");
+      return;
+    }
+
+    setSavingJob(true);
+
+    const url = editingJobId
+      ? `${API_BASE}/api/admin/jobs/${editingJobId}`
+      : `${API_BASE}/api/admin/jobs`;
+    const method = editingJobId ? "PUT" : "POST";
+
+    fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-password": sessionPassword,
+      },
+      body: JSON.stringify(jobFormData),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((d) => {
+            throw new Error(d.error || "Failed to save job posting.");
+          });
+        }
+        return res.json();
+      })
+      .then(() => {
+        setSavingJob(false);
+        setIsJobModalOpen(false);
+        fetchAdminJobs();
+      })
+      .catch((err) => {
+        alert(err.message);
+        setSavingJob(false);
+      });
+  };
+
+  const handleToggleJobStatus = (jobId, currentStatus) => {
+    const nextStatus = currentStatus === "open" ? "closed" : "open";
+    fetch(`${API_BASE}/api/admin/jobs/${jobId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-password": sessionPassword,
+      },
+      body: JSON.stringify({ status: nextStatus }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to toggle status.");
+        return res.json();
+      })
+      .then(() => {
+        fetchAdminJobs();
+      })
+      .catch((err) => alert(err.message));
+  };
+
+  const handleDeleteJob = (jobId, jobTitle) => {
+    if (!window.confirm(`Are you sure you want to delete "${jobTitle}" and all its submitted applications?`)) {
+      return;
+    }
+
+    fetch(`${API_BASE}/api/admin/jobs/${jobId}`, {
+      method: "DELETE",
+      headers: { "x-admin-password": sessionPassword },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to delete job.");
+        return res.json();
+      })
+      .then(() => {
+        fetchAdminJobs();
+        fetchAdminApplications(selectedJobIdForApps);
+      })
+      .catch((err) => alert(err.message));
+  };
+
+  const handleUpdateAppStatus = (appId, newStatus) => {
+    fetch(`${API_BASE}/api/admin/applications/${appId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-password": sessionPassword,
+      },
+      body: JSON.stringify({ status: newStatus }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to update status.");
+        return res.json();
+      })
+      .then(() => {
+        fetchAdminApplications(selectedJobIdForApps);
+        if (selectedAppDetail && selectedAppDetail._id === appId) {
+          setSelectedAppDetail((prev) => (prev ? { ...prev, status: newStatus } : null));
+        }
+      })
+      .catch((err) => alert(err.message));
+  };
+
+  const handleDownloadResume = async (appId, applicantName) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/applications/${appId}/resume`, {
+        headers: { "x-admin-password": sessionPassword },
+      });
+      if (!res.ok) {
+        alert("Failed to download resume.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Resume_${applicantName.replace(/\s+/g, "_")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error downloading resume:", err);
+      alert("Error downloading resume.");
+    }
   };
 
   // Fetch Waitlist Submissions
@@ -483,6 +736,21 @@ export default function AdminPortal() {
                       }}
                     >
                       👥 Waitlist Submissions
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("careers")}
+                      className="btn font-mono"
+                      style={{
+                        padding: "8px 16px",
+                        fontSize: "11px",
+                        backgroundColor: activeTab === "careers" ? "var(--color-primary)" : "var(--color-surface-low)",
+                        color: activeTab === "careers" ? "var(--color-on-primary)" : "var(--color-primary)",
+                        border: "1px solid var(--color-primary)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      💼 Careers &amp; Jobs
                     </button>
                   </div>
                 </div>
@@ -916,6 +1184,846 @@ export default function AdminPortal() {
                   )}
                 </div>
               )}
+
+              {/* TAB 3: CAREERS & JOBS MANAGER */}
+              {activeTab === "careers" && (
+                <div>
+                  {/* Action Header */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "16px",
+                      marginBottom: "24px",
+                      padding: "20px",
+                      border: "1px solid var(--color-primary)",
+                      backgroundColor: "var(--color-surface-low)",
+                    }}
+                  >
+                    <div>
+                      <h2 className="font-display" style={{ fontSize: "24px" }}>
+                        Careers &amp; Applications Portal
+                      </h2>
+                      <p className="font-body text-muted" style={{ fontSize: "13px", marginTop: "4px" }}>
+                        Post open job roles, toggle status, and review candidate resume applications.
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        onClick={() => setJobSubTab("jobs")}
+                        className="btn font-mono"
+                        style={{
+                          padding: "10px 16px",
+                          fontSize: "11px",
+                          backgroundColor:
+                            jobSubTab === "jobs" ? "var(--color-primary)" : "var(--color-surface-low)",
+                          color:
+                            jobSubTab === "jobs" ? "var(--color-on-primary)" : "var(--color-primary)",
+                          border: "1px solid var(--color-primary)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        📋 Job Postings ({adminJobs.length})
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setJobSubTab("applications")}
+                        className="btn font-mono"
+                        style={{
+                          padding: "10px 16px",
+                          fontSize: "11px",
+                          backgroundColor:
+                            jobSubTab === "applications" ? "var(--color-primary)" : "var(--color-surface-low)",
+                          color:
+                            jobSubTab === "applications" ? "var(--color-on-primary)" : "var(--color-primary)",
+                          border: "1px solid var(--color-primary)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        📥 Candidates ({adminApplications.length})
+                      </button>
+
+                      {jobSubTab === "jobs" && (
+                        <button
+                          type="button"
+                          onClick={handleOpenCreateJobModal}
+                          className="btn font-mono"
+                          style={{
+                            backgroundColor: "var(--color-yellow-accent)",
+                            color: "var(--color-primary)",
+                            padding: "10px 20px",
+                            fontSize: "11px",
+                            fontWeight: "bold",
+                            border: "1px solid var(--color-primary)",
+                            boxShadow: "3px 3px 0px 0px var(--color-primary)",
+                            cursor: "pointer",
+                          }}
+                        >
+                          💼 + Post New Job
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {jobsError && (
+                    <div
+                      style={{
+                        border: "1px solid #ff3b30",
+                        backgroundColor: "rgba(255, 59, 48, 0.05)",
+                        color: "#ff3b30",
+                        padding: "16px",
+                        marginBottom: "24px",
+                        fontFamily: "var(--font-jetbrains), monospace",
+                        fontSize: "12px",
+                      }}
+                    >
+                      ⚠️ ERROR: {jobsError}
+                    </div>
+                  )}
+
+                  {/* SUB-TAB 1: JOBS LIST */}
+                  {jobSubTab === "jobs" && (
+                    <>
+                      {jobsLoading ? (
+                        <div style={{ textAlign: "center", padding: "40px 0" }}>
+                          <p className="font-mono text-outline" style={{ fontSize: "12px" }}>
+                            LOADING JOB POSTINGS...
+                          </p>
+                        </div>
+                      ) : adminJobs.length === 0 ? (
+                        <div
+                          style={{
+                            textAlign: "center",
+                            padding: "40px",
+                            border: "1px dashed var(--color-outline-variant)",
+                            backgroundColor: "var(--color-surface-low)",
+                          }}
+                        >
+                          <p className="font-mono text-outline" style={{ fontSize: "12px" }}>
+                            NO JOB POSTINGS FOUND. CLICK &quot;+ POST NEW JOB&quot; TO ADD ONE.
+                          </p>
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            overflowX: "auto",
+                            border: "1px solid var(--color-primary)",
+                            boxShadow: "4px 4px 0px 0px var(--color-primary)",
+                          }}
+                        >
+                          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                            <thead>
+                              <tr
+                                style={{
+                                  backgroundColor: "var(--color-primary)",
+                                  color: "var(--color-on-primary)",
+                                  fontFamily: "var(--font-jetbrains), monospace",
+                                  fontSize: "10px",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.05em",
+                                }}
+                              >
+                                <th style={{ padding: "14px 16px" }}>Title &amp; Slug</th>
+                                <th style={{ padding: "14px 16px" }}>Dept / Type</th>
+                                <th style={{ padding: "14px 16px" }}>Location</th>
+                                <th style={{ padding: "14px 16px" }}>Status</th>
+                                <th style={{ padding: "14px 16px" }}>Posted Date</th>
+                                <th style={{ padding: "14px 16px" }}>Applications</th>
+                                <th style={{ padding: "14px 16px" }}>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {adminJobs.map((job, idx) => (
+                                <tr
+                                  key={job._id}
+                                  style={{
+                                    borderBottom: "1px solid var(--color-outline-variant)",
+                                    backgroundColor: idx % 2 === 0 ? "transparent" : "var(--color-surface-low)",
+                                  }}
+                                >
+                                  <td style={{ padding: "14px 16px" }}>
+                                    <strong style={{ display: "block" }}>{job.title}</strong>
+                                    <span className="font-mono" style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>
+                                      /careers/{job.slug}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: "14px 16px" }}>
+                                    <span className="font-mono" style={{ fontSize: "11px", fontWeight: "bold" }}>
+                                      {job.department}
+                                    </span>{" "}
+                                    ({job.type})
+                                  </td>
+                                  <td style={{ padding: "14px 16px" }}>📍 {job.location}</td>
+                                  <td style={{ padding: "14px 16px" }}>
+                                    <span
+                                      className="font-mono"
+                                      style={{
+                                        fontSize: "10px",
+                                        padding: "2px 8px",
+                                        fontWeight: "bold",
+                                        backgroundColor:
+                                          job.status === "open"
+                                            ? "rgba(46, 125, 50, 0.15)"
+                                            : "rgba(255, 59, 48, 0.15)",
+                                        color: job.status === "open" ? "#2e7d32" : "#ff3b30",
+                                        border: `1px solid ${job.status === "open" ? "#2e7d32" : "#ff3b30"}`,
+                                      }}
+                                    >
+                                      {job.status.toUpperCase()}
+                                    </span>
+                                  </td>
+                                  <td className="font-mono" style={{ padding: "14px 16px", fontSize: "11px" }}>
+                                    {new Date(job.postedAt || job.createdAt).toLocaleDateString()}
+                                  </td>
+                                  <td className="font-mono" style={{ padding: "14px 16px", fontWeight: "bold" }}>
+                                    {job.applicationCount || 0} candidates
+                                  </td>
+                                  <td style={{ padding: "14px 16px" }}>
+                                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenEditJobModal(job)}
+                                        className="btn font-mono"
+                                        style={{ padding: "4px 8px", fontSize: "9px", border: "1px solid var(--color-primary)" }}
+                                      >
+                                        EDIT
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleToggleJobStatus(job._id, job.status)}
+                                        className="btn font-mono"
+                                        style={{
+                                          padding: "4px 8px",
+                                          fontSize: "9px",
+                                          backgroundColor: job.status === "open" ? "#fff" : "#2e7d32",
+                                          color: job.status === "open" ? "#333" : "#fff",
+                                          border: "1px solid #333",
+                                        }}
+                                      >
+                                        {job.status === "open" ? "CLOSE" : "REOPEN"}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedJobIdForApps(job._id);
+                                          setJobSubTab("applications");
+                                        }}
+                                        className="btn font-mono"
+                                        style={{ padding: "4px 8px", fontSize: "9px", backgroundColor: "var(--color-primary)", color: "#fff" }}
+                                      >
+                                        APPS ({job.applicationCount || 0})
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteJob(job._id, job.title)}
+                                        className="btn font-mono"
+                                        style={{ padding: "4px 8px", fontSize: "9px", color: "#ff3b30", border: "1px solid #ff3b30" }}
+                                      >
+                                        DELETE
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* SUB-TAB 2: APPLICATIONS LIST */}
+                  {jobSubTab === "applications" && (
+                    <>
+                      {/* Filter Bar */}
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "16px",
+                          marginBottom: "24px",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          <span className="font-mono" style={{ fontSize: "11px" }}>Filter Job:</span>
+                          <select
+                            value={selectedJobIdForApps}
+                            onChange={(e) => setSelectedJobIdForApps(e.target.value)}
+                            style={{
+                              padding: "8px 12px",
+                              border: "1px solid var(--color-primary)",
+                              fontFamily: "var(--font-jetbrains), monospace",
+                              fontSize: "11px",
+                              backgroundColor: "var(--color-surface-lowest)",
+                            }}
+                          >
+                            <option value="ALL">ALL JOBS ({adminJobs.length})</option>
+                            {adminJobs.map((j) => (
+                              <option key={j._id} value={j._id}>
+                                {j.title} ({j.department})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          <span className="font-mono" style={{ fontSize: "11px" }}>Status:</span>
+                          <select
+                            value={appStatusFilter}
+                            onChange={(e) => setAppStatusFilter(e.target.value)}
+                            style={{
+                              padding: "8px 12px",
+                              border: "1px solid var(--color-primary)",
+                              fontFamily: "var(--font-jetbrains), monospace",
+                              fontSize: "11px",
+                              backgroundColor: "var(--color-surface-lowest)",
+                            }}
+                          >
+                            <option value="ALL">ALL STATUSES</option>
+                            <option value="new">NEW</option>
+                            <option value="reviewed">REVIEWED</option>
+                            <option value="shortlisted">SHORTLISTED</option>
+                            <option value="rejected">REJECTED</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {appsLoading ? (
+                        <div style={{ textAlign: "center", padding: "40px 0" }}>
+                          <p className="font-mono text-outline" style={{ fontSize: "12px" }}>
+                            LOADING CANDIDATE APPLICATIONS...
+                          </p>
+                        </div>
+                      ) : adminApplications.length === 0 ? (
+                        <div
+                          style={{
+                            textAlign: "center",
+                            padding: "40px",
+                            border: "1px dashed var(--color-outline-variant)",
+                            backgroundColor: "var(--color-surface-low)",
+                          }}
+                        >
+                          <p className="font-mono text-outline" style={{ fontSize: "12px" }}>
+                            NO CANDIDATE APPLICATIONS FOUND FOR THIS FILTER.
+                          </p>
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            overflowX: "auto",
+                            border: "1px solid var(--color-primary)",
+                            boxShadow: "4px 4px 0px 0px var(--color-primary)",
+                          }}
+                        >
+                          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                            <thead>
+                              <tr
+                                style={{
+                                  backgroundColor: "var(--color-primary)",
+                                  color: "var(--color-on-primary)",
+                                  fontFamily: "var(--font-jetbrains), monospace",
+                                  fontSize: "10px",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.05em",
+                                }}
+                              >
+                                <th style={{ padding: "14px 16px" }}>Candidate Name</th>
+                                <th style={{ padding: "14px 16px" }}>Email / Phone</th>
+                                <th style={{ padding: "14px 16px" }}>College</th>
+                                <th style={{ padding: "14px 16px" }}>Applied Job</th>
+                                <th style={{ padding: "14px 16px" }}>Applied Date</th>
+                                <th style={{ padding: "14px 16px" }}>Status</th>
+                                <th style={{ padding: "14px 16px" }}>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {adminApplications
+                                .filter((app) => appStatusFilter === "ALL" || app.status === appStatusFilter)
+                                .map((app, idx) => (
+                                  <tr
+                                    key={app._id}
+                                    style={{
+                                      borderBottom: "1px solid var(--color-outline-variant)",
+                                      backgroundColor: idx % 2 === 0 ? "transparent" : "var(--color-surface-low)",
+                                    }}
+                                  >
+                                    <td style={{ padding: "14px 16px", fontWeight: "bold" }}>
+                                      {app.applicantName}
+                                    </td>
+                                    <td className="font-mono" style={{ padding: "14px 16px", fontSize: "11px" }}>
+                                      {app.applicantEmail} <br />
+                                      <span style={{ color: "var(--color-text-muted)" }}>{app.applicantPhone || "-"}</span>
+                                    </td>
+                                    <td style={{ padding: "14px 16px" }}>{app.collegeName || "-"}</td>
+                                    <td style={{ padding: "14px 16px" }}>
+                                      <strong>{app.job?.title || "Unknown Job"}</strong> <br />
+                                      <span className="font-mono" style={{ fontSize: "10px", color: "var(--color-text-muted)" }}>
+                                        {app.job?.department}
+                                      </span>
+                                    </td>
+                                    <td className="font-mono" style={{ padding: "14px 16px", fontSize: "11px" }}>
+                                      {new Date(app.appliedAt || app.createdAt).toLocaleDateString()}
+                                    </td>
+                                    <td style={{ padding: "14px 16px" }}>
+                                      <select
+                                        value={app.status}
+                                        onChange={(e) => handleUpdateAppStatus(app._id, e.target.value)}
+                                        className="font-mono"
+                                        style={{
+                                          padding: "4px 8px",
+                                          fontSize: "10px",
+                                          fontWeight: "bold",
+                                          backgroundColor:
+                                            app.status === "shortlisted"
+                                              ? "rgba(46, 125, 50, 0.15)"
+                                              : app.status === "rejected"
+                                              ? "rgba(255, 59, 48, 0.15)"
+                                              : app.status === "reviewed"
+                                              ? "rgba(255, 149, 0, 0.15)"
+                                              : "rgba(0, 122, 255, 0.15)",
+                                          color:
+                                            app.status === "shortlisted"
+                                              ? "#2e7d32"
+                                              : app.status === "rejected"
+                                              ? "#ff3b30"
+                                              : app.status === "reviewed"
+                                              ? "#e65100"
+                                              : "#007aff",
+                                          border: "1px solid var(--color-outline-variant)",
+                                        }}
+                                      >
+                                        <option value="new">NEW</option>
+                                        <option value="reviewed">REVIEWED</option>
+                                        <option value="shortlisted">SHORTLISTED</option>
+                                        <option value="rejected">REJECTED</option>
+                                      </select>
+                                    </td>
+                                    <td style={{ padding: "14px 16px" }}>
+                                      <div style={{ display: "flex", gap: "6px" }}>
+                                        <button
+                                          type="button"
+                                          onClick={() => setSelectedAppDetail(app)}
+                                          className="btn font-mono"
+                                          style={{ padding: "4px 8px", fontSize: "9px", backgroundColor: "var(--color-primary)", color: "#fff" }}
+                                        >
+                                          VIEW
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDownloadResume(app._id, app.applicantName)}
+                                          className="btn font-mono"
+                                          style={{ padding: "4px 8px", fontSize: "9px", backgroundColor: "var(--color-yellow-accent)", color: "var(--color-primary)", border: "1px solid var(--color-primary)" }}
+                                        >
+                                          📄 RESUME
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+
+          {/* JOB EDITOR MODAL */}
+          {isJobModalOpen && (
+            <div style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              padding: "16px",
+            }}>
+              <div style={{
+                width: "100%",
+                maxWidth: "800px",
+                border: "2px solid var(--color-primary)",
+                boxShadow: "10px 10px 0px 0px var(--color-primary)",
+                backgroundColor: "var(--color-surface-lowest)",
+                padding: "32px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                position: "relative",
+              }}>
+                <button
+                  onClick={() => setIsJobModalOpen(false)}
+                  style={{
+                    position: "absolute",
+                    top: "16px",
+                    right: "16px",
+                    background: "none",
+                    border: "none",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                  }}
+                >
+                  &times;
+                </button>
+
+                <h3 className="font-display" style={{ fontSize: "24px", marginBottom: "20px" }}>
+                  {editingJobId ? "Edit Job Posting" : "Post New Job Role"}
+                </h3>
+
+                <form onSubmit={handleSaveJob} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                        JOB TITLE *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Frontend Developer Intern"
+                        value={jobFormData.title}
+                        onChange={(e) => setJobFormData({ ...jobFormData, title: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          border: "1px solid var(--color-primary)",
+                          fontFamily: "var(--font-hanken), sans-serif",
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                        DEPARTMENT *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Tech, Marketing, Design, Operations"
+                        value={jobFormData.department}
+                        onChange={(e) => setJobFormData({ ...jobFormData, department: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          border: "1px solid var(--color-primary)",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                        LOCATION *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Remote, On-campus - Kanpur"
+                        value={jobFormData.location}
+                        onChange={(e) => setJobFormData({ ...jobFormData, location: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          border: "1px solid var(--color-primary)",
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                        EMPLOYMENT TYPE *
+                      </label>
+                      <select
+                        value={jobFormData.type}
+                        onChange={(e) => setJobFormData({ ...jobFormData, type: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          border: "1px solid var(--color-primary)",
+                          backgroundColor: "#fff",
+                        }}
+                      >
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Gig">Gig</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                        STATUS *
+                      </label>
+                      <select
+                        value={jobFormData.status}
+                        onChange={(e) => setJobFormData({ ...jobFormData, status: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          border: "1px solid var(--color-primary)",
+                          backgroundColor: "#fff",
+                        }}
+                      >
+                        <option value="open">OPEN</option>
+                        <option value="closed">CLOSED</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                      URL SLUG (OPTIONAL)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Auto-generated if left blank (e.g. frontend-developer-intern)"
+                      value={jobFormData.slug}
+                      onChange={(e) => setJobFormData({ ...jobFormData, slug: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        border: "1px solid var(--color-primary)",
+                        fontFamily: "var(--font-jetbrains), monospace",
+                        fontSize: "12px",
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                      JOB DESCRIPTION *
+                    </label>
+                    <textarea
+                      required
+                      rows={4}
+                      placeholder="Detailed overview of the role..."
+                      value={jobFormData.description}
+                      onChange={(e) => setJobFormData({ ...jobFormData, description: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        border: "1px solid var(--color-primary)",
+                        fontSize: "13px",
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                      RESPONSIBILITIES (ONE PER LINE)
+                    </label>
+                    <textarea
+                      rows={4}
+                      placeholder="Build responsive React UI components&#10;Integrate REST APIs with backend&#10;Collaborate with design team"
+                      value={jobFormData.responsibilities}
+                      onChange={(e) => setJobFormData({ ...jobFormData, responsibilities: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        border: "1px solid var(--color-primary)",
+                        fontSize: "13px",
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "6px" }}>
+                      REQUIREMENTS (ONE PER LINE)
+                    </label>
+                    <textarea
+                      rows={4}
+                      placeholder="Proficiency in React.js and JavaScript (ES6+)&#10;Familiarity with Git and REST APIs&#10;Strong communication skills"
+                      value={jobFormData.requirements}
+                      onChange={(e) => setJobFormData({ ...jobFormData, requirements: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        border: "1px solid var(--color-primary)",
+                        fontSize: "13px",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "16px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setIsJobModalOpen(false)}
+                      className="btn font-mono"
+                      style={{ padding: "10px 20px", border: "1px solid var(--color-outline)" }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingJob}
+                      className="btn font-mono"
+                      style={{
+                        padding: "10px 24px",
+                        backgroundColor: "var(--color-primary)",
+                        color: "#fff",
+                        border: "none",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {savingJob ? "Saving..." : editingJobId ? "Update Job Role" : "Publish Job Role"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* APPLICATION DETAILS MODAL */}
+          {selectedAppDetail && (
+            <div style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              padding: "16px",
+            }}>
+              <div style={{
+                width: "100%",
+                maxWidth: "650px",
+                border: "2px solid var(--color-primary)",
+                boxShadow: "10px 10px 0px 0px var(--color-primary)",
+                backgroundColor: "var(--color-surface-lowest)",
+                padding: "32px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                position: "relative",
+              }}>
+                <button
+                  onClick={() => setSelectedAppDetail(null)}
+                  style={{
+                    position: "absolute",
+                    top: "16px",
+                    right: "16px",
+                    background: "none",
+                    border: "none",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                  }}
+                >
+                  &times;
+                </button>
+
+                <h3 className="font-display" style={{ fontSize: "24px", marginBottom: "16px", borderBottom: "1px solid var(--color-primary)", paddingBottom: "12px" }}>
+                  Candidate Application Detail
+                </h3>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", fontSize: "13px" }}>
+                    <div>
+                      <strong>Applicant Name:</strong> <br /> {selectedAppDetail.applicantName}
+                    </div>
+                    <div>
+                      <strong>Email:</strong> <br /> {selectedAppDetail.applicantEmail}
+                    </div>
+                    <div>
+                      <strong>Phone:</strong> <br /> {selectedAppDetail.applicantPhone || "N/A"}
+                    </div>
+                    <div>
+                      <strong>College:</strong> <br /> {selectedAppDetail.collegeName || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Applied Position:</strong> <br /> {selectedAppDetail.job?.title || "N/A"} ({selectedAppDetail.job?.department})
+                    </div>
+                    <div>
+                      <strong>Applied Date:</strong> <br /> {new Date(selectedAppDetail.appliedAt || selectedAppDetail.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div>
+                    <strong>Application Status:</strong> <br />
+                    <select
+                      value={selectedAppDetail.status}
+                      onChange={(e) => handleUpdateAppStatus(selectedAppDetail._id, e.target.value)}
+                      className="font-mono"
+                      style={{
+                        marginTop: "6px",
+                        padding: "6px 12px",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        border: "1px solid var(--color-primary)",
+                      }}
+                    >
+                      <option value="new">NEW</option>
+                      <option value="reviewed">REVIEWED</option>
+                      <option value="shortlisted">SHORTLISTED</option>
+                      <option value="rejected">REJECTED</option>
+                    </select>
+                  </div>
+
+                  <hr style={{ border: "none", borderTop: "1px solid var(--color-outline-variant)", margin: "8px 0" }} />
+
+                  <div>
+                    <strong>Cover Note / Intro:</strong>
+                    <p
+                      className="font-body"
+                      style={{
+                        padding: "12px",
+                        backgroundColor: "var(--color-surface-low)",
+                        borderLeft: "3px solid var(--color-primary)",
+                        marginTop: "6px",
+                        fontSize: "13px",
+                        lineHeight: "1.6",
+                      }}
+                    >
+                      {selectedAppDetail.coverNote || "No cover note provided by candidate."}
+                    </p>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadResume(selectedAppDetail._id, selectedAppDetail.applicantName)}
+                      className="btn font-mono"
+                      style={{
+                        flexGrow: 1,
+                        backgroundColor: "var(--color-yellow-accent)",
+                        color: "var(--color-primary)",
+                        padding: "12px",
+                        fontWeight: "bold",
+                        border: "1px solid var(--color-primary)",
+                        boxShadow: "3px 3px 0px 0px var(--color-primary)",
+                      }}
+                    >
+                      📄 Download PDF Resume
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAppDetail(null)}
+                      className="btn font-mono"
+                      style={{
+                        padding: "12px 24px",
+                        backgroundColor: "var(--color-primary)",
+                        color: "#fff",
+                        border: "none",
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
             </div>
           )}
 
