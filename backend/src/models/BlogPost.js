@@ -47,6 +47,7 @@ const BlogPostSchema = new mongoose.Schema(
       default: "EARN",
       uppercase: true,
       trim: true,
+      index: true,
     },
     keywords: {
       type: [String],
@@ -65,12 +66,15 @@ const BlogPostSchema = new mongoose.Schema(
     published: {
       type: Boolean,
       default: true,
+      index: true,
     },
   },
   {
     timestamps: true,
   }
 );
+
+BlogPostSchema.index({ title: 'text', excerpt: 'text', keywords: 'text' });
 
 export default mongoose.models.BlogPost ||
   mongoose.model("BlogPost", BlogPostSchema);
