@@ -53,7 +53,7 @@ export default function JobDetailPage() {
       : "Apply for careers and internships at Jugarr.",
     canonicalUrl: `https://jugarr.in/careers/${slug}`,
     ogType: "website",
-    robots: job ? "index, follow" : "noindex, follow",
+    robots: "index, follow",
   });
 
   const handleFileChange = (e) => {
