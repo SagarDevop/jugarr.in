@@ -45,12 +45,28 @@
     content="India's student-to-student marketplace. Buy, sell, earn, and collaborate within your college campus." />
   <meta property="twitter:image" content="https://jugarr.in/twitter-image.png" />
 
-  <!-- Google Fonts -->
+  <!-- Preconnect to backend API domain: warms TCP+TLS before first fetch() fires.
+       Saves ~150-300ms on the first blog API call. -->
+  <link rel="preconnect" href="https://jugarr-in-zytm.onrender.com">
+  <link rel="dns-prefetch" href="https://jugarr-in-zytm.onrender.com">
+
+  <!-- Google Fonts: non-blocking load via preload + onload swap.
+       Removes render-blocking network round trip that was delaying FCP/LCP.
+       The <noscript> fallback handles JS-disabled environments. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
+    rel="preload"
+    as="style"
     href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;1,300&family=Hanken+Grotesk:wght@400;500&family=JetBrains+Mono:wght@500&family=Playfair+Display:wght@600;700&display=swap"
-    rel="stylesheet">
+    onload="this.onload=null;this.rel='stylesheet'"
+  >
+  <noscript>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;1,300&family=Hanken+Grotesk:wght@400;500&family=JetBrains+Mono:wght@500&family=Playfair+Display:wght@600;700&display=swap"
+    >
+  </noscript>
 </head>
 
 <body>

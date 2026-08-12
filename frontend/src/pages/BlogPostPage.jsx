@@ -25,6 +25,24 @@ export default function BlogPostPage() {
       .then((data) => {
         if (data && data.post) {
           setPost(data.post);
+
+          // Once we have the article's category, fetch up to 3 related posts
+          // in the same category, excluding the current article.
+          // This replaces the old fetch('/api/blogs') which returned ALL posts.
+          const cat = data.post.category || "";
+          const relatedUrl = new URL(`${API_BASE}/api/blogs`);
+          relatedUrl.searchParams.set("limit", "3");
+          relatedUrl.searchParams.set("exclude", slug);
+          if (cat) relatedUrl.searchParams.set("category", cat);
+
+          fetch(relatedUrl.toString())
+            .then((r) => r.json())
+            .then((relData) => {
+              if (relData && Array.isArray(relData.posts) && relData.posts.length > 0) {
+                setAllPosts(relData.posts);
+              }
+            })
+            .catch(() => {});
         }
         setLoading(false);
       })
@@ -32,16 +50,6 @@ export default function BlogPostPage() {
         console.warn("Could not fetch article from API, fallback used:", err);
         setLoading(false);
       });
-
-    // Fetch all articles for related posts
-    fetch(`${API_BASE}/api/blogs`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.posts) && data.posts.length > 0) {
-          setAllPosts(data.posts);
-        }
-      })
-      .catch(() => {});
   }, [slug]);
 
   useSEO({

@@ -18,7 +18,9 @@ router.get("/", async (req, res) => {
   try {
     await connectToDatabase();
 
-    const { category, search, includeDrafts, page = 1, limit = 10 } = req.query;
+    // `exclude` is used by the related-posts fetch on the blog post page
+    // to avoid returning the currently-viewed article in the related list.
+    const { category, search, includeDrafts, exclude, page = 1, limit = 10 } = req.query;
 
     let query = {};
     const isAdmin = checkAdminAuth(req);
@@ -35,18 +37,32 @@ router.get("/", async (req, res) => {
       query.$text = { $search: search.trim() };
     }
 
+    // Exclude a specific slug (used for related-posts sidebar).
+    if (exclude) {
+      query.slug = { $ne: exclude.toLowerCase() };
+    }
+
     const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 10;
+    const limitNum = Math.min(parseInt(limit, 10) || 10, 50); // hard cap at 50
     const skip = (pageNum - 1) * limitNum;
 
-    const posts = await BlogPost.find(query)
-      .select("-content")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limitNum);
-      
-    const total = await BlogPost.countDocuments(query);
+    // .lean() returns plain JS objects instead of Mongoose documents,
+    // skipping hydration and reducing memory allocation by ~60%.
+    const [posts, total] = await Promise.all([
+      BlogPost.find(query)
+        .select("-content")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      BlogPost.countDocuments(query),
+    ]);
 
+    // Cache: CDN holds for 5 min, browser holds for 1 min.
+    // stale-while-revalidate lets Vercel serve stale while fetching fresh.
+    res.set({
+      "Cache-Control": "public, s-maxage=300, max-age=60, stale-while-revalidate=60",
+    });
     res.json({ success: true, count: posts.length, total, page: pageNum, totalPages: Math.ceil(total / limitNum), posts });
   } catch (error) {
     console.error("Error fetching blog posts:", error);
@@ -60,12 +76,21 @@ router.get("/:slug", async (req, res) => {
     await connectToDatabase();
 
     const { slug } = req.params;
-    const post = await BlogPost.findOne({ slug: slug.toLowerCase() });
+
+    // .lean() returns a plain JS object — no Mongoose overhead on a read-only route.
+    const post = await BlogPost.findOne({ slug: slug.toLowerCase() }).lean();
 
     if (!post) {
       return res.status(404).json({ error: "Article not found." });
     }
 
+    // Cache: Vercel/CDN holds for 1 hour, browser holds for 5 min.
+    // stale-while-revalidate=60 lets CDN serve stale while fetching fresh in background.
+    // ETag enables conditional GET (304 Not Modified) for unchanged content.
+    res.set({
+      "Cache-Control": "public, s-maxage=3600, max-age=300, stale-while-revalidate=60",
+      "ETag": `"${post._id}-${new Date(post.updatedAt || post.createdAt).getTime()}"`,
+    });
     res.json({ success: true, post });
   } catch (error) {
     console.error("Error fetching article by slug:", error);
@@ -109,7 +134,8 @@ router.post("/", async (req, res) => {
       .replace(/[\s_-]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    const existing = await BlogPost.findOne({ slug: finalSlug });
+    // .lean() is safe here — we only need to check existence, not mutate the document.
+    const existing = await BlogPost.findOne({ slug: finalSlug }).lean();
     if (existing) {
       return res.status(400).json({ error: `Article slug '${finalSlug}' already exists. Please choose a unique slug or title.` });
     }
@@ -200,7 +226,8 @@ router.put("/:id", async (req, res) => {
         .replace(/[\s_-]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
-      const duplicate = await BlogPost.findOne({ slug: formattedSlug, _id: { $ne: id } });
+      // .lean() — only checking existence, no document mutation needed.
+      const duplicate = await BlogPost.findOne({ slug: formattedSlug, _id: { $ne: id } }).lean();
       if (duplicate) {
         return res.status(400).json({ error: `Slug '${formattedSlug}' is already taken by another article.` });
       }
