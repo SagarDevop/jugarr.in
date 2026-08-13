@@ -102,6 +102,44 @@ export default function AdminPortal() {
   const [isJugarrisModalOpen, setIsJugarrisModalOpen] = useState(false);
   const [editingJugarrisId, setEditingJugarrisId] = useState(null);
   const [savingJugarris, setSavingJugarris] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const handleImageFileUpload = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setUploadError("");
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/jugarris/upload-image`, {
+        method: "POST",
+        headers: {
+          "x-admin-password": sessionPassword,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to upload photo.");
+      }
+
+      setJugarrisFormData((prev) => ({
+        ...prev,
+        profileImage: data.url,
+      }));
+    } catch (err) {
+      console.error("Profile photo upload error:", err);
+      setUploadError(err.message || "Failed to upload photo.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const initialJugarrisFormState = {
     name: "",
@@ -1921,7 +1959,7 @@ export default function AdminPortal() {
                               <tr key={person._id} style={{ borderBottom: "1px solid var(--color-outline-variant)" }}>
                                 <td style={{ padding: "12px" }}>
                                   <img
-                                    src={person.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
+                                    src={person.profileImage ? (person.profileImage.startsWith("/uploads") ? `${API_BASE}${person.profileImage}` : person.profileImage) : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
                                     alt={person.name}
                                     style={{ width: "38px", height: "38px", borderRadius: "50%", objectFit: "cover" }}
                                   />
@@ -2070,13 +2108,77 @@ export default function AdminPortal() {
                   </div>
 
                   <div>
-                    <label className="font-mono" style={{ fontSize: "12px" }}>Profile Photo URL</label>
+                    <label className="font-mono" style={{ fontSize: "12px", display: "block", marginBottom: "6px" }}>
+                      Profile Photo (Upload from Computer or Paste Image URL)
+                    </label>
+                    
+                    {/* File Upload Control */}
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "8px" }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="profile-image-file-input"
+                        style={{ display: "none" }}
+                        onChange={handleImageFileUpload}
+                      />
+                      <label
+                        htmlFor="profile-image-file-input"
+                        className="btn font-mono"
+                        style={{
+                          padding: "8px 16px",
+                          fontSize: "12px",
+                          backgroundColor: "var(--color-primary)",
+                          color: "var(--color-on-primary)",
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                          border: "none",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        📁 Select Photo from Computer
+                      </label>
+                      {uploadingImage && <span className="font-mono text-muted" style={{ fontSize: "12px" }}>Uploading photo...</span>}
+                    </div>
+
+                    {uploadError && (
+                      <p className="font-mono" style={{ color: "var(--color-error, #ef4444)", fontSize: "11px", marginBottom: "8px" }}>
+                        {uploadError}
+                      </p>
+                    )}
+
+                    {/* Image Thumbnail Preview */}
+                    {jugarrisFormData.profileImage && (
+                      <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "8px", padding: "8px", backgroundColor: "var(--color-surface-low)", border: "1px solid var(--color-outline-variant)", borderRadius: "6px" }}>
+                        <img
+                          src={jugarrisFormData.profileImage.startsWith("/uploads") ? `${API_BASE}${jugarrisFormData.profileImage}` : jugarrisFormData.profileImage}
+                          alt="Preview"
+                          style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--color-primary)" }}
+                        />
+                        <div style={{ flex: 1, overflow: "hidden" }}>
+                          <span className="font-mono" style={{ fontSize: "11px", display: "block", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                            {jugarrisFormData.profileImage}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setJugarrisFormData({ ...jugarrisFormData, profileImage: "" })}
+                          className="btn font-mono"
+                          style={{ padding: "4px 8px", fontSize: "10px", backgroundColor: "#fee2e2", color: "#991b1b", border: "none" }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Alternative URL Input */}
                     <input
-                      type="url"
+                      type="text"
                       value={jugarrisFormData.profileImage}
                       onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, profileImage: e.target.value })}
-                      placeholder="https://images.unsplash.com/..."
-                      style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      placeholder="Or paste external image URL (https://...)"
+                      style={{ width: "100%", padding: "8px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px", fontSize: "12px" }}
                     />
                   </div>
 

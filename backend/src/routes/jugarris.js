@@ -1,8 +1,44 @@
 import { Router } from "express";
+import fs from "fs";
+import path from "path";
+import multer from "multer";
 import connectToDatabase from "../lib/mongoose.js";
 import JugarrContributor from "../models/JugarrContributor.js";
 
 const router = Router();
+
+// Ensure profiles upload directory exists
+const PROFILES_UPLOAD_DIR = path.join(process.cwd(), "uploads", "profiles");
+if (!fs.existsSync(PROFILES_UPLOAD_DIR)) {
+  fs.mkdirSync(PROFILES_UPLOAD_DIR, { recursive: true });
+}
+
+// Multer Storage Configuration for Profile Photos
+const profileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, PROFILES_UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
+    cb(null, `profile-${uniqueSuffix}${ext}`);
+  },
+});
+
+const profileUpload = multer({
+  storage: profileStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|webp|gif|svg/;
+    const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
+    const mime = file.mimetype.toLowerCase();
+    if (allowed.test(ext) || allowed.test(mime)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files (JPG, PNG, WEBP, GIF, SVG) are allowed."), false);
+    }
+  },
+});
 
 // Admin auth middleware helper
 function checkAdminAuth(req) {
@@ -20,6 +56,38 @@ function generateSlug(text) {
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+/**
+ * POST /api/jugarris/upload-image - Admin: Upload contributor profile photo from computer
+ */
+router.post("/upload-image", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ error: "Unauthorized. Invalid admin password." });
+  }
+
+  profileUpload.single("image")(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ error: "Image size too large. Maximum size is 5MB." });
+        }
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(400).json({ error: err.message || "Failed to upload image." });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file uploaded." });
+    }
+
+    const relativeUrl = `/uploads/profiles/${req.file.filename}`;
+    res.json({
+      success: true,
+      url: relativeUrl,
+      filename: req.file.filename,
+    });
+  });
+});
 
 /**
  * GET /api/jugarris - Public list of active contributors

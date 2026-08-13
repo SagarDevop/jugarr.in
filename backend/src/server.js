@@ -13,6 +13,8 @@ import careersRoutes from "./routes/careers.js";
 
 import jugarrisRoutes from "./routes/jugarris.js";
 
+import path from "path";
+
 dotenv.config();
 
 const app = express();
@@ -75,6 +77,9 @@ app.use(
 app.use(compression());
 
 app.use(express.json());
+
+// Serve uploads static folder
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // API endpoints
 app.use("/api/ping", pingRoutes);

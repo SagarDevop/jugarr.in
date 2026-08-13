@@ -111,7 +111,7 @@ export default function JugarrisIndex() {
                   <div key={person._id || person.slug} className="jugarris-card">
                     <div className="jugarris-card-header">
                       <img
-                        src={person.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
+                        src={person.profileImage ? (person.profileImage.startsWith("/uploads") ? `${API_BASE}${person.profileImage}` : person.profileImage) : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
                         alt={person.name}
                         className="jugarris-card-avatar"
                         loading="lazy"
