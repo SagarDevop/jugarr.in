@@ -21,7 +21,7 @@ export default function Team() {
           <div className="member-card">
             <img
               src={sagarImg}
-              alt="Aryan K. Founder portrait"
+              alt="Sagar Singh Rajawat Founder of Jugarr"
               className="member-image"
             />
             <div className="member-info">
@@ -67,7 +67,7 @@ export default function Team() {
           <div className="member-card offset">
             <img
               src={princeImg}
-              alt="Megha S. Founder portrait"
+              alt="Prince Mishra co-founder of jugarr"
               className="member-image"
             />
             <div className="member-info">
