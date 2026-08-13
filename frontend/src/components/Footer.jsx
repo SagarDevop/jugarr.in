@@ -78,7 +78,7 @@ export default function Footer() {
             <Link to="/careers" className="footer-link">
               Careers
             </Link>
-            <Link to="/meet-the-jugarris" className="footer-link font-medium" style={{ color: "var(--color-primary, #10b981)" }}>
+            <Link to="/meet-the-jugarris" className="footer-link">
               Meet The Jugarris
             </Link>
           </div>
