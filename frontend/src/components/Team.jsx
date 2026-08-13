@@ -97,7 +97,7 @@ export default function Team() {
                   </svg>
                 </a>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/prince-mishra-09"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="member-social-link"
