@@ -48,26 +48,6 @@ export default function JugarrisIndex() {
     );
   });
 
-  const getProfileImageSrc = (person) => {
-    if (!person) return "https://ui-avatars.com/api/?name=Jugarr&background=10B981&color=fff&bold=true&size=400";
-    const nameLower = (person.name || "").toLowerCase();
-    if (nameLower.includes("sagar")) {
-      return "https://github.com/SagarDevop.png";
-    }
-    if (nameLower.includes("prince")) {
-      return "https://github.com/prince-mishra-09.png";
-    }
-    if (person.profileImage) {
-      if (person.profileImage.startsWith("http://") || person.profileImage.startsWith("https://")) {
-        return person.profileImage;
-      }
-      if (person.profileImage.startsWith("/uploads")) {
-        return `${API_BASE}${person.profileImage}`;
-      }
-    }
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name || "Jugarr")}&background=10B981&color=fff&bold=true&size=400`;
-  };
-
   return (
     <>
       <Header />
@@ -131,14 +111,10 @@ export default function JugarrisIndex() {
                   <div key={person._id || person.slug} className="jugarris-card">
                     <div className="jugarris-card-header">
                       <img
-                        src={getProfileImageSrc(person)}
+                        src={person.profileImage ? (person.profileImage.startsWith("/uploads") ? `${API_BASE}${person.profileImage}` : person.profileImage) : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
                         alt={person.name}
                         className="jugarris-card-avatar"
                         loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name || "Jugarr")}&background=10B981&color=fff&bold=true&size=400`;
-                        }}
                       />
                       {person.featured && (
                         <span className="jugarris-featured-badge">Featured</span>

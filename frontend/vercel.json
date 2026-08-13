@@ -13,10 +13,6 @@
       "destination": "https://jugarr-in-zytm.onrender.com/sitemap.xml"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "https://jugarr-in-zytm.onrender.com/api/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

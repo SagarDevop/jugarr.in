@@ -12,7 +12,6 @@ import sitemapRoutes from "./routes/sitemap.js";
 import careersRoutes from "./routes/careers.js";
 
 import jugarrisRoutes from "./routes/jugarris.js";
-import ogRoutes from "./routes/og.js";
 
 import path from "path";
 
@@ -88,7 +87,6 @@ app.use("/api/waitlist", waitlistRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/jugarris", jugarrisRoutes);
-app.use("/api/og", ogRoutes);
 app.use("/api", careersRoutes);
 app.use("/sitemap.xml", sitemapRoutes);
 
