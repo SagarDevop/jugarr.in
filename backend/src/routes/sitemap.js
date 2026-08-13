@@ -1,6 +1,7 @@
 import express from "express";
 import BlogPost from "../models/BlogPost.js";
 import Job from "../models/Job.js";
+import JugarrContributor from "../models/JugarrContributor.js";
 
 const router = express.Router();
 
@@ -23,22 +24,26 @@ function escapeXml(str) {
  *
  * Dynamically generates the XML sitemap from MongoDB data.
  * Includes:
- *   - Static pages (/, /blog, /careers)
+ *   - Static pages (/, /blog, /careers, /meet-the-jugarris)
  *   - All published blog posts (published: true)
  *   - All open job postings (status: "open")
+ *   - All active contributors (active: true)
  *
  * Cached for 5 minutes to balance freshness and DB load.
- * A newly published blog/job will appear in the sitemap within 5 minutes.
  */
 router.get("/", async (req, res) => {
   try {
-    const [blogs, jobs] = await Promise.all([
+    const [blogs, jobs, jugarris] = await Promise.all([
       BlogPost.find({ published: true })
         .select("slug updatedAt createdAt")
         .sort({ updatedAt: -1 })
         .lean(),
       Job.find({ status: "open" })
         .select("slug updatedAt createdAt postedAt")
+        .sort({ updatedAt: -1 })
+        .lean(),
+      JugarrContributor.find({ active: true })
+        .select("slug updatedAt createdAt")
         .sort({ updatedAt: -1 })
         .lean(),
     ]);
@@ -67,6 +72,12 @@ router.get("/", async (req, res) => {
     xml += `    <priority>0.9</priority>\n`;
     xml += `  </url>\n`;
 
+    xml += `  <url>\n`;
+    xml += `    <loc>${SITE}/meet-the-jugarris</loc>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
+
     // ── Dynamic blog pages ───────────────────────────────────────────────────
     for (const blog of blogs) {
       const lastmod = blog.updatedAt || blog.createdAt;
@@ -89,6 +100,19 @@ router.get("/", async (req, res) => {
         xml += `    <lastmod>${new Date(lastmod).toISOString()}</lastmod>\n`;
       }
       xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    // ── Dynamic contributor pages ────────────────────────────────────────────
+    for (const contributor of jugarris) {
+      const lastmod = contributor.updatedAt || contributor.createdAt;
+      xml += `  <url>\n`;
+      xml += `    <loc>${escapeXml(`${SITE}/meet-the-jugarris/${contributor.slug}`)}</loc>\n`;
+      if (lastmod) {
+        xml += `    <lastmod>${new Date(lastmod).toISOString()}</lastmod>\n`;
+      }
+      xml += `    <changefreq>monthly</changefreq>\n`;
       xml += `    <priority>0.8</priority>\n`;
       xml += `  </url>\n`;
     }

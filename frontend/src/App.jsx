@@ -7,6 +7,8 @@ import CareersIndex from "./pages/CareersIndex.jsx";
 import JobDetailPage from "./pages/JobDetailPage.jsx";
 import Success from "./pages/Success.jsx";
 import AdminPortal from "./pages/AdminPortal.jsx";
+import JugarrisIndex from "./pages/JugarrisIndex.jsx";
+import JugarrProfilePage from "./pages/JugarrProfilePage.jsx";
 
 export default function App() {
   const { pathname, hash } = useLocation();
@@ -49,6 +51,8 @@ export default function App() {
       <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/careers" element={<CareersIndex />} />
       <Route path="/careers/:slug" element={<JobDetailPage />} />
+      <Route path="/meet-the-jugarris" element={<JugarrisIndex />} />
+      <Route path="/meet-the-jugarris/:slug" element={<JugarrProfilePage />} />
       <Route path="/success" element={<Success />} />
       <Route path="/admin" element={<AdminPortal />} />
     </Routes>

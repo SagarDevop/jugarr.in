@@ -85,10 +85,164 @@ export default function AdminPortal() {
     setBlogs([]);
     setAdminJobs([]);
     setAdminApplications([]);
+    setJugarrisList([]);
     setError("");
     setBlogError("");
     setJobsError("");
     setAppsError("");
+    setJugarrisError("");
+  };
+
+  // Community -> Jugarris Management State
+  const [jugarrisList, setJugarrisList] = useState([]);
+  const [jugarrisLoading, setJugarrisLoading] = useState(false);
+  const [jugarrisError, setJugarrisError] = useState("");
+  const [jugarrisSearch, setJugarrisSearch] = useState("");
+  const [jugarrisFilter, setJugarrisFilter] = useState("ALL"); // "ALL" | "ACTIVE" | "INACTIVE"
+  const [isJugarrisModalOpen, setIsJugarrisModalOpen] = useState(false);
+  const [editingJugarrisId, setEditingJugarrisId] = useState(null);
+  const [savingJugarris, setSavingJugarris] = useState(false);
+
+  const initialJugarrisFormState = {
+    name: "",
+    slug: "",
+    profileImage: "",
+    role: "Contributor",
+    shortBio: "",
+    longBio: "",
+    journey: "",
+    linkedin: "",
+    instagram: "",
+    github: "",
+    twitter: "",
+    website: "",
+    joinedDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+    featured: false,
+    active: true,
+  };
+  const [jugarrisFormData, setJugarrisFormData] = useState(initialJugarrisFormState);
+
+  const fetchAdminJugarris = () => {
+    if (!sessionPassword) return;
+    setJugarrisLoading(true);
+    setJugarrisError("");
+
+    fetch(`${API_BASE}/api/jugarris?includeInactive=true`, {
+      headers: { "x-admin-password": sessionPassword },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load contributors.");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.contributors)) {
+          setJugarrisList(data.contributors);
+        }
+        setJugarrisLoading(false);
+      })
+      .catch((err) => {
+        console.error("Jugarris fetch error:", err);
+        setJugarrisError(err.message || "Could not load contributors.");
+        setJugarrisLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (sessionPassword && activeTab === "jugarris") {
+      fetchAdminJugarris();
+    }
+  }, [sessionPassword, activeTab]);
+
+  const handleOpenCreateJugarrisModal = () => {
+    setEditingJugarrisId(null);
+    setJugarrisFormData(initialJugarrisFormState);
+    setIsJugarrisModalOpen(true);
+  };
+
+  const handleOpenEditJugarrisModal = (person) => {
+    setEditingJugarrisId(person._id);
+    setJugarrisFormData({
+      name: person.name || "",
+      slug: person.slug || "",
+      profileImage: person.profileImage || "",
+      role: person.role || "Contributor",
+      shortBio: person.shortBio || "",
+      longBio: person.longBio || "",
+      journey: person.journey || "",
+      linkedin: person.linkedin || "",
+      instagram: person.instagram || "",
+      github: person.github || "",
+      twitter: person.twitter || "",
+      website: person.website || "",
+      joinedDate: person.joinedDate || "",
+      featured: !!person.featured,
+      active: person.active !== undefined ? !!person.active : true,
+    });
+    setIsJugarrisModalOpen(true);
+  };
+
+  const handleToggleActiveJugarris = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/jugarris/${id}/toggle-active`, {
+        method: "PATCH",
+        headers: { "x-admin-password": sessionPassword },
+      });
+      if (!res.ok) throw new Error("Failed to toggle status");
+      fetchAdminJugarris();
+    } catch (err) {
+      alert("Error toggling contributor status: " + err.message);
+    }
+  };
+
+  const handleDeleteJugarris = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this contributor profile?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/jugarris/${id}`, {
+        method: "DELETE",
+        headers: { "x-admin-password": sessionPassword },
+      });
+      if (!res.ok) throw new Error("Failed to delete contributor");
+      fetchAdminJugarris();
+    } catch (err) {
+      alert("Error deleting contributor: " + err.message);
+    }
+  };
+
+  const handleSaveJugarris = async (e) => {
+    e.preventDefault();
+    if (!jugarrisFormData.name.trim() || !jugarrisFormData.shortBio.trim()) {
+      alert("Full Name and Short Bio are required.");
+      return;
+    }
+
+    setSavingJugarris(true);
+    const method = editingJugarrisId ? "PUT" : "POST";
+    const endpoint = editingJugarrisId
+      ? `${API_BASE}/api/jugarris/${editingJugarrisId}`
+      : `${API_BASE}/api/jugarris`;
+
+    try {
+      const res = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": sessionPassword,
+        },
+        body: JSON.stringify(jugarrisFormData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save contributor.");
+      }
+
+      setIsJugarrisModalOpen(false);
+      fetchAdminJugarris();
+    } catch (err) {
+      alert("Error saving contributor: " + err.message);
+    } finally {
+      setSavingJugarris(false);
+    }
   };
 
   // Careers & Jobs Management State
@@ -751,6 +905,21 @@ export default function AdminPortal() {
                       }}
                     >
                       💼 Careers &amp; Jobs
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("jugarris")}
+                      className="btn font-mono"
+                      style={{
+                        padding: "8px 16px",
+                        fontSize: "11px",
+                        backgroundColor: activeTab === "jugarris" ? "var(--color-primary)" : "var(--color-surface-low)",
+                        color: activeTab === "jugarris" ? "var(--color-on-primary)" : "var(--color-primary)",
+                        border: "1px solid var(--color-primary)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      🌟 Community &rarr; Jugarris
                     </button>
                   </div>
                 </div>
@@ -1634,6 +1803,407 @@ export default function AdminPortal() {
                   )}
                 </div>
               )}
+
+              {/* TAB 4: COMMUNITY -> JUGARRIS MANAGER */}
+              {activeTab === "jugarris" && (
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "16px",
+                      marginBottom: "24px",
+                      padding: "20px",
+                      border: "1px solid var(--color-primary)",
+                      backgroundColor: "var(--color-surface-low)",
+                    }}
+                  >
+                    <div>
+                      <h2 className="font-display" style={{ fontSize: "24px" }}>
+                        Community &rarr; Jugarris Manager
+                      </h2>
+                      <p className="font-body text-muted" style={{ fontSize: "13px", marginTop: "4px" }}>
+                        Manage founders, early supporters, creators, and contributors showcased on /meet-the-jugarris.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleOpenCreateJugarrisModal}
+                      className="btn font-mono"
+                      style={{
+                        backgroundColor: "var(--color-primary)",
+                        color: "var(--color-on-primary)",
+                        padding: "10px 20px",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      + Add New Contributor
+                    </button>
+                  </div>
+
+                  {/* Filter and Search Bar */}
+                  <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
+                    <input
+                      type="text"
+                      placeholder="Search contributor name, role, bio..."
+                      value={jugarrisSearch}
+                      onChange={(e) => setJugarrisSearch(e.target.value)}
+                      className="font-body"
+                      style={{
+                        flex: 1,
+                        minWidth: "240px",
+                        padding: "10px 14px",
+                        border: "1px solid var(--color-outline-variant)",
+                        borderRadius: "4px",
+                        backgroundColor: "var(--color-surface)",
+                      }}
+                    />
+                    <select
+                      value={jugarrisFilter}
+                      onChange={(e) => setJugarrisFilter(e.target.value)}
+                      className="font-mono"
+                      style={{
+                        padding: "10px 14px",
+                        border: "1px solid var(--color-outline-variant)",
+                        borderRadius: "4px",
+                        backgroundColor: "var(--color-surface)",
+                        fontSize: "12px",
+                      }}
+                    >
+                      <option value="ALL">All Statuses</option>
+                      <option value="ACTIVE">Active Only</option>
+                      <option value="INACTIVE">Inactive Only</option>
+                    </select>
+                  </div>
+
+                  {jugarrisLoading ? (
+                    <p className="font-mono text-muted">Loading contributors list...</p>
+                  ) : jugarrisError ? (
+                    <p className="font-mono" style={{ color: "var(--color-error, #ef4444)" }}>{jugarrisError}</p>
+                  ) : jugarrisList.length === 0 ? (
+                    <p className="font-mono text-muted">No contributors found in database.</p>
+                  ) : (
+                    <div style={{ overflowX: "auto", border: "1px solid var(--color-outline-variant)" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                        <thead>
+                          <tr style={{ backgroundColor: "var(--color-surface-low)", borderBottom: "1px solid var(--color-outline-variant)" }}>
+                            <th style={{ padding: "12px" }}>Photo</th>
+                            <th style={{ padding: "12px" }}>Name &amp; Role</th>
+                            <th style={{ padding: "12px" }}>Slug</th>
+                            <th style={{ padding: "12px" }}>Joined</th>
+                            <th style={{ padding: "12px" }}>Featured</th>
+                            <th style={{ padding: "12px" }}>Status</th>
+                            <th style={{ padding: "12px" }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {jugarrisList
+                            .filter((person) => {
+                              if (jugarrisFilter === "ACTIVE" && !person.active) return false;
+                              if (jugarrisFilter === "INACTIVE" && person.active) return false;
+                              if (jugarrisSearch.trim()) {
+                                const q = jugarrisSearch.toLowerCase();
+                                return (
+                                  person.name.toLowerCase().includes(q) ||
+                                  (person.role && person.role.toLowerCase().includes(q)) ||
+                                  (person.shortBio && person.shortBio.toLowerCase().includes(q))
+                                );
+                              }
+                              return true;
+                            })
+                            .map((person) => (
+                              <tr key={person._id} style={{ borderBottom: "1px solid var(--color-outline-variant)" }}>
+                                <td style={{ padding: "12px" }}>
+                                  <img
+                                    src={person.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
+                                    alt={person.name}
+                                    style={{ width: "38px", height: "38px", borderRadius: "50%", objectFit: "cover" }}
+                                  />
+                                </td>
+                                <td style={{ padding: "12px" }}>
+                                  <strong style={{ display: "block" }}>{person.name}</strong>
+                                  <span className="font-mono text-muted" style={{ fontSize: "11px" }}>{person.role || "Contributor"}</span>
+                                </td>
+                                <td style={{ padding: "12px" }} className="font-mono">
+                                  <a href={`/meet-the-jugarris/${person.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)" }}>
+                                    /{person.slug}
+                                  </a>
+                                </td>
+                                <td style={{ padding: "12px" }}>{person.joinedDate || "-"}</td>
+                                <td style={{ padding: "12px" }}>
+                                  {person.featured ? <span style={{ color: "#d97706", fontWeight: "bold" }}>★ Featured</span> : "-"}
+                                </td>
+                                <td style={{ padding: "12px" }}>
+                                  <span style={{ padding: "4px 8px", borderRadius: "12px", fontSize: "11px", backgroundColor: person.active ? "#d1fae5" : "#fee2e2", color: person.active ? "#065f46" : "#991b1b", fontWeight: "bold" }}>
+                                    {person.active ? "Active" : "Inactive"}
+                                  </span>
+                                </td>
+                                <td style={{ padding: "12px" }}>
+                                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                                    <button onClick={() => handleOpenEditJugarrisModal(person)} className="btn font-mono" style={{ padding: "4px 10px", fontSize: "11px", border: "1px solid var(--color-primary)", backgroundColor: "transparent" }}>
+                                      Edit
+                                    </button>
+                                    <button onClick={() => handleToggleActiveJugarris(person._id)} className="btn font-mono" style={{ padding: "4px 10px", fontSize: "11px", backgroundColor: "var(--color-surface-low)" }}>
+                                      {person.active ? "Deactivate" : "Activate"}
+                                    </button>
+                                    <button onClick={() => handleDeleteJugarris(person._id)} className="btn font-mono" style={{ padding: "4px 10px", fontSize: "11px", backgroundColor: "#fee2e2", color: "#991b1b", border: "none" }}>
+                                      Delete
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+          {/* JUGARRIS EDITOR MODAL */}
+          {isJugarrisModalOpen && (
+            <div style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              padding: "16px",
+            }}>
+              <div style={{
+                backgroundColor: "var(--color-surface)",
+                border: "1px solid var(--color-primary)",
+                borderRadius: "8px",
+                maxWidth: "650px",
+                width: "100%",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                padding: "24px",
+                position: "relative",
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setIsJugarrisModalOpen(false)}
+                  style={{
+                    position: "absolute",
+                    top: "16px",
+                    right: "16px",
+                    background: "none",
+                    border: "none",
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    color: "var(--color-primary)"
+                  }}
+                  aria-label="Close modal"
+                >
+                  ×
+                </button>
+
+                <h3 className="font-display" style={{ fontSize: "20px", marginBottom: "16px", borderBottom: "1px solid var(--color-primary)", paddingBottom: "8px" }}>
+                  {editingJugarrisId ? "Edit Contributor Profile" : "Add New Contributor"}
+                </h3>
+
+                <form onSubmit={handleSaveJugarris} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={jugarrisFormData.name}
+                        onChange={(e) => {
+                          const nameVal = e.target.value;
+                          setJugarrisFormData({
+                            ...jugarrisFormData,
+                            name: nameVal,
+                            slug: editingJugarrisId ? jugarrisFormData.slug : generateSlug(nameVal),
+                          });
+                        }}
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Slug *</label>
+                      <input
+                        type="text"
+                        required
+                        value={jugarrisFormData.slug}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, slug: e.target.value })}
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Role Title</label>
+                      <input
+                        type="text"
+                        value={jugarrisFormData.role}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, role: e.target.value })}
+                        placeholder="e.g. Founding Contributor"
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Joined Date</label>
+                      <input
+                        type="text"
+                        value={jugarrisFormData.joinedDate}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, joinedDate: e.target.value })}
+                        placeholder="e.g. Aug 2024"
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "12px" }}>Profile Photo URL</label>
+                    <input
+                      type="url"
+                      value={jugarrisFormData.profileImage}
+                      onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, profileImage: e.target.value })}
+                      placeholder="https://images.unsplash.com/..."
+                      style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "12px" }}>Short Bio (100-250 characters) *</label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={jugarrisFormData.shortBio}
+                      onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, shortBio: e.target.value })}
+                      style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                    />
+                    <span className="font-mono text-muted" style={{ fontSize: "11px" }}>{jugarrisFormData.shortBio.length} characters</span>
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "12px" }}>Detailed Bio (About Section)</label>
+                    <textarea
+                      rows={3}
+                      value={jugarrisFormData.longBio}
+                      onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, longBio: e.target.value })}
+                      placeholder="Detailed introduction about background, expertise, and contribution..."
+                      style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "12px" }}>Journey With Jugarr</label>
+                    <textarea
+                      rows={3}
+                      value={jugarrisFormData.journey}
+                      onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, journey: e.target.value })}
+                      placeholder="Story of how they joined Jugarr and helped grow the community..."
+                      style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>LinkedIn URL</label>
+                      <input
+                        type="url"
+                        value={jugarrisFormData.linkedin}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, linkedin: e.target.value })}
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>GitHub URL</label>
+                      <input
+                        type="url"
+                        value={jugarrisFormData.github}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, github: e.target.value })}
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Twitter / X URL</label>
+                      <input
+                        type="url"
+                        value={jugarrisFormData.twitter}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, twitter: e.target.value })}
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Instagram URL</label>
+                      <input
+                        type="url"
+                        value={jugarrisFormData.instagram}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, instagram: e.target.value })}
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-mono" style={{ fontSize: "12px" }}>Website URL</label>
+                    <input
+                      type="url"
+                      value={jugarrisFormData.website}
+                      onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, website: e.target.value })}
+                      style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: "24px", margin: "10px 0" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }} className="font-mono text-muted">
+                      <input
+                        type="checkbox"
+                        checked={jugarrisFormData.featured}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, featured: e.target.checked })}
+                      />
+                      Featured Contributor
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }} className="font-mono text-muted">
+                      <input
+                        type="checkbox"
+                        checked={jugarrisFormData.active}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, active: e.target.checked })}
+                      />
+                      Active / Published Status
+                    </label>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "12px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setIsJugarrisModalOpen(false)}
+                      className="btn font-mono"
+                      style={{ backgroundColor: "var(--color-surface-low)" }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingJugarris}
+                      className="btn font-mono"
+                      style={{ backgroundColor: "var(--color-primary)", color: "var(--color-on-primary)", border: "none" }}
+                    >
+                      {savingJugarris ? "Saving..." : editingJugarrisId ? "Update Contributor" : "Create Contributor"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* JOB EDITOR MODAL */}
           {isJobModalOpen && (

@@ -11,6 +11,8 @@ import sitemapRoutes from "./routes/sitemap.js";
 
 import careersRoutes from "./routes/careers.js";
 
+import jugarrisRoutes from "./routes/jugarris.js";
+
 dotenv.config();
 
 const app = express();
@@ -79,6 +81,7 @@ app.use("/api/ping", pingRoutes);
 app.use("/api/waitlist", waitlistRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/jugarris", jugarrisRoutes);
 app.use("/api", careersRoutes);
 app.use("/sitemap.xml", sitemapRoutes);
 

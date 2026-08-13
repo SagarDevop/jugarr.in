@@ -68,24 +68,30 @@ export default function Footer() {
         </div>
         <div className="footer-nav">
           <div className="footer-col">
-            <span className="footer-col-title">Network</span>
-            <Link to="#" className="footer-link">
-              Privacy Policy
+            <span className="footer-col-title">Explore</span>
+            <Link to="/#about-jugarr" className="footer-link">
+              About
             </Link>
-            <Link to="#" className="footer-link">
-              Terms of Service
+            <Link to="/blog" className="footer-link">
+              Blog
+            </Link>
+            <Link to="/careers" className="footer-link">
+              Careers
+            </Link>
+            <Link to="/meet-the-jugarris" className="footer-link font-medium" style={{ color: "var(--color-primary, #10b981)" }}>
+              Meet The Jugarris
             </Link>
           </div>
           <div className="footer-col">
             <span className="footer-col-title">Join Us</span>
-            <Link to="/careers" className="footer-link">
-              Careers
+            <Link to="/#contact" className="footer-link">
+              Contact Us
             </Link>
             <Link to="#" className="footer-link">
               Campus Ambassadors
             </Link>
             <Link to="#" className="footer-link">
-              Contact Us
+              Privacy Policy
             </Link>
             <Link to="/admin" className="footer-link">
               Staff Portal
