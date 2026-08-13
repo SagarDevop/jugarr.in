@@ -6,55 +6,12 @@ import PageLoader from "@/components/PageLoader.jsx";
 import { useSEO } from "@/hooks/useSEO.js";
 import { getApiBaseUrl } from "@/lib/api.js";
 
-const fallbackProfiles = {
-  "sagar-singh": {
-    name: "Sagar Singh",
-    slug: "sagar-singh",
-    role: "Founding Jugarr Contributor & Lead Developer",
-    profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Building full-stack architecture and student marketplace technology to empower campus micro-economies across India.",
-    longBio: "Sagar Singh is a tech enthusiast and product architect passionate about solving real-world challenges for college students. At Jugarr, he spearheads platform engineering, backend scalability, and seamless user experiences.",
-    journey: "Sagar joined Jugarr on day one, recognizing that students across colleges were trading books, services, and gadgets through fragmented messaging apps. He helped architect Jugarr's core student marketplace engine.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    twitter: "https://x.com",
-    joinedDate: "Aug 2024",
-    featured: true,
-  },
-  "prince-kumar": {
-    name: "Prince Kumar",
-    slug: "prince-kumar",
-    role: "Founding Contributor & Community Strategist",
-    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Fostering campus relationships, ambassador networks, and student engagement programs across partner universities.",
-    longBio: "Prince Kumar focuses on community growth and outreach strategy. He works closely with campus leaders to launch peer-to-peer trading hubs and student skill showcases.",
-    journey: "Prince spearheaded the initial campus outreach initiative for Jugarr, establishing founding student groups and gathering feedback that shaped the platform's core identity.",
-    linkedin: "https://linkedin.com",
-    instagram: "https://instagram.com",
-    joinedDate: "Sep 2024",
-    featured: true,
-  },
-  "rahul-verma": {
-    name: "Rahul Verma",
-    slug: "rahul-verma",
-    role: "UI/UX & Product Design Contributor",
-    profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Crafting intuitive visual systems, glassmorphism interfaces, and accessible design patterns for the Jugarr ecosystem.",
-    longBio: "Rahul Verma is a UI/UX designer who believes that digital tools for students should be visual, fast, and empowering. He translates complex requirements into clean component systems.",
-    journey: "Rahul collaborated on Jugarr's early design system, ensuring mobile-first responsiveness and dark-mode light theme harmonious aesthetics.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    joinedDate: "Oct 2024",
-  },
-};
-
 export default function JugarrProfilePage() {
   const API_BASE = getApiBaseUrl();
   const { slug } = useParams();
-  const fallback = fallbackProfiles[slug];
 
-  const [person, setPerson] = useState(fallback || null);
-  const [loading, setLoading] = useState(!fallback);
+  const [person, setPerson] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/jugarris/${slug}`)
@@ -69,7 +26,7 @@ export default function JugarrProfilePage() {
         setLoading(false);
       })
       .catch((err) => {
-        console.warn("Could not fetch contributor profile from API, using fallback:", err);
+        console.warn("Could not fetch contributor profile from API:", err);
         setLoading(false);
       });
   }, [slug, API_BASE]);
@@ -274,7 +231,7 @@ export default function JugarrProfilePage() {
                       ))
                     ) : (
                       <p>
-                        {person.name} joined Jugarr as a key community contributor, helping build the platform's vision of campus micro-economies and peer-to-peer student trust across India.
+                        {person.name} joined Jugarr as a key community contributor, helping build the platform&apos;s vision of campus micro-economies and peer-to-peer student trust across India.
                       </p>
                     )}
                   </div>
@@ -329,7 +286,7 @@ export default function JugarrProfilePage() {
             <div className="profile-footer-links-card">
               <h3 className="font-display">Explore the Jugarr Ecosystem</h3>
               <p className="font-body text-muted">
-                Discover more about Jugarr's student marketplace, open career positions, and campus updates.
+                Discover more about Jugarr&apos;s student marketplace, open career positions, and campus updates.
               </p>
               <div className="profile-nav-links font-mono">
                 <Link to="/">Home</Link>

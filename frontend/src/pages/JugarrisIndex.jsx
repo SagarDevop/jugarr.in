@@ -6,62 +6,9 @@ import PageLoader from "@/components/PageLoader.jsx";
 import { useSEO } from "@/hooks/useSEO.js";
 import { getApiBaseUrl } from "@/lib/api.js";
 
-// Fallback initial data in case database is offline or loading
-const fallbackJugarris = [
-  {
-    _id: "fb-1",
-    name: "Sagar Singh",
-    slug: "sagar-singh",
-    role: "Founding Jugarr Contributor & Lead Developer",
-    profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Building full-stack architecture and student marketplace technology to empower campus micro-economies across India.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    twitter: "https://x.com",
-    featured: true,
-    active: true,
-  },
-  {
-    _id: "fb-2",
-    name: "Prince Kumar",
-    slug: "prince-kumar",
-    role: "Founding Contributor & Community Strategist",
-    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Fostering campus relationships, ambassador networks, and student engagement programs across partner universities.",
-    linkedin: "https://linkedin.com",
-    instagram: "https://instagram.com",
-    featured: true,
-    active: true,
-  },
-  {
-    _id: "fb-3",
-    name: "Rahul Verma",
-    slug: "rahul-verma",
-    role: "UI/UX & Product Design Contributor",
-    profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Crafting intuitive visual systems, glassmorphism interfaces, and accessible design patterns for the Jugarr ecosystem.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    featured: false,
-    active: true,
-  },
-  {
-    _id: "fb-4",
-    name: "Ananya Sharma",
-    slug: "ananya-sharma",
-    role: "Content & Brand Creator",
-    profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80",
-    shortBio: "Spearheading student stories, editorial content, and social media campaigns celebrating campus entrepreneurship.",
-    instagram: "https://instagram.com",
-    twitter: "https://x.com",
-    featured: false,
-    active: true,
-  },
-];
-
 export default function JugarrisIndex() {
   const API_BASE = getApiBaseUrl();
-  const [jugarris, setJugarris] = useState(fallbackJugarris);
+  const [jugarris, setJugarris] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -79,13 +26,14 @@ export default function JugarrisIndex() {
         return res.json();
       })
       .then((data) => {
-        if (data && Array.isArray(data.contributors) && data.contributors.length > 0) {
+        if (data && Array.isArray(data.contributors)) {
           setJugarris(data.contributors);
         }
         setLoading(false);
       })
       .catch((err) => {
-        console.warn("Could not fetch Jugarris from API, using fallback:", err);
+        console.warn("Could not fetch Jugarris from API:", err);
+        setJugarris([]);
         setLoading(false);
       });
   }, [API_BASE]);
@@ -139,15 +87,23 @@ export default function JugarrisIndex() {
               <PageLoader message="LOADING CONTRIBUTORS..." />
             ) : filteredJugarris.length === 0 ? (
               <div className="jugarris-empty-state">
-                <h3>No contributors found matching "{searchQuery}"</h3>
-                <p>Try searching for a different name or role title.</p>
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="btn btn-secondary"
-                  style={{ marginTop: "16px" }}
-                >
-                  Clear Search
-                </button>
+                <h3 className="font-display" style={{ fontSize: "20px", marginBottom: "8px" }}>
+                  {searchQuery ? `No contributors found matching "${searchQuery}"` : "No Contributors Added Yet"}
+                </h3>
+                <p className="font-body text-muted" style={{ fontSize: "14px" }}>
+                  {searchQuery
+                    ? "Try searching for a different name or role title."
+                    : "Contributors will appear here as they are added via the Admin Portal."}
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="btn btn-secondary"
+                    style={{ marginTop: "16px" }}
+                  >
+                    Clear Search
+                  </button>
+                )}
               </div>
             ) : (
               <div className="jugarris-grid">
@@ -233,7 +189,7 @@ export default function JugarrisIndex() {
             <div className="jugarris-internal-links-card">
               <h3 className="font-display">Explore More of Jugarr</h3>
               <p className="font-body text-muted">
-                Jugarr is building India's premier student-to-student campus marketplace. Learn more about our mission, open roles, and stories.
+                Jugarr is building India&apos;s premier student-to-student campus marketplace. Learn more about our mission, open roles, and stories.
               </p>
               <div className="jugarris-links-grid">
                 <Link to="/" className="jugarris-nav-btn">Home</Link>
