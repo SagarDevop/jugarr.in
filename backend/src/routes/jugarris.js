@@ -4,6 +4,7 @@ import path from "path";
 import multer from "multer";
 import connectToDatabase from "../lib/mongoose.js";
 import JugarrContributor from "../models/JugarrContributor.js";
+import { invalidateOgCache } from "./og.js";
 
 const router = Router();
 
@@ -306,6 +307,7 @@ router.put("/:id", async (req, res) => {
     }
 
     await contributor.save();
+    invalidateOgCache(contributor.slug);
     res.json({ success: true, contributor });
   } catch (error) {
     console.error("Error updating contributor:", error);
@@ -333,6 +335,7 @@ router.patch("/:id/toggle-active", async (req, res) => {
 
     contributor.active = !contributor.active;
     await contributor.save();
+    invalidateOgCache(contributor.slug);
 
     res.json({ success: true, active: contributor.active, contributor });
   } catch (error) {
@@ -358,6 +361,7 @@ router.delete("/:id", async (req, res) => {
     if (!deleted) {
       return res.status(404).json({ error: "Contributor not found." });
     }
+    invalidateOgCache(deleted.slug);
 
     res.json({ success: true, message: "Contributor profile deleted successfully." });
   } catch (error) {
