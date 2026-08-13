@@ -1,4 +1,4 @@
-import princeImg from "@/assets/aryan.jpeg";
+import princeImg from "@/assets/prince-mishra-co-founder.jpeg";
 import sagarImg from "@/assets/founder.jpeg";
 
 export default function Team() {
