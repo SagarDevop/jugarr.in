@@ -33,16 +33,18 @@ export default function JugarrProfilePage() {
 
   const profileUrl = `https://jugarr.in/meet-the-jugarris/${slug}`;
 
+  const profileImageUrl = person?.profileImage
+    ? (person.profileImage.startsWith("/uploads") ? `${API_BASE}${person.profileImage}` : person.profileImage)
+    : "https://jugarr.in/opengraph-image.png";
+
   useSEO({
-    title: person
-      ? `${person.name} | ${person.role || "Jugarr Contributor"}`
-      : "Contributor Profile | Jugarr",
+    title: person ? `${person.name} (${person.role || "Contributor"}) | Jugarris` : "Contributor Profile | Jugarr",
     description: person
       ? `Learn more about ${person.name}, an early contributor helping shape the future of Jugarr.`
       : "Meet the contributors, creators, and community members behind Jugarr.",
     canonicalUrl: profileUrl,
     ogType: "profile",
-    ogImage: person?.profileImage || "https://jugarr.in/opengraph-image.png",
+    ogImage: profileImageUrl,
     robots: "index, follow",
   });
 
@@ -63,7 +65,7 @@ export default function JugarrProfilePage() {
       "@type": "Person",
       "name": person.name,
       "url": profileUrl,
-      "image": person.profileImage || "https://jugarr.in/opengraph-image.png",
+      "image": profileImageUrl,
       "jobTitle": person.role || "Jugarr Contributor",
       "worksFor": {
         "@type": "Organization",

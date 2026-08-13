@@ -4,16 +4,17 @@ import path from "path";
 import multer from "multer";
 import connectToDatabase from "../lib/mongoose.js";
 import JugarrContributor from "../models/JugarrContributor.js";
+import { uploadBufferToCloudinary, isCloudinaryConfigured } from "../lib/cloudinary.js";
 
 const router = Router();
 
-// Ensure profiles upload directory exists
+// Ensure profiles upload directory exists (for fallback disk storage)
 const PROFILES_UPLOAD_DIR = path.join(process.cwd(), "uploads", "profiles");
 if (!fs.existsSync(PROFILES_UPLOAD_DIR)) {
   fs.mkdirSync(PROFILES_UPLOAD_DIR, { recursive: true });
 }
 
-// Multer Storage Configuration for Profile Photos
+// Multer Storage Configuration for Profile Photos (Disk Fallback)
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, PROFILES_UPLOAD_DIR);
@@ -25,19 +26,29 @@ const profileStorage = multer.diskStorage({
   },
 });
 
-const profileUpload = multer({
+const imageFileFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|webp|gif|svg/;
+  const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
+  const mime = file.mimetype.toLowerCase();
+  if (allowed.test(ext) || allowed.test(mime)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files (JPG, PNG, WEBP, GIF, SVG) are allowed."), false);
+  }
+};
+
+// Disk upload middleware
+const profileUploadDisk = multer({
   storage: profileStorage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|gif|svg/;
-    const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
-    const mime = file.mimetype.toLowerCase();
-    if (allowed.test(ext) || allowed.test(mime)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files (JPG, PNG, WEBP, GIF, SVG) are allowed."), false);
-    }
-  },
+  fileFilter: imageFileFilter,
+});
+
+// Memory upload middleware (for Cloudinary stream upload)
+const profileUploadMemory = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: imageFileFilter,
 });
 
 // Admin auth middleware helper
@@ -58,14 +69,20 @@ function generateSlug(text) {
 }
 
 /**
- * POST /api/jugarris/upload-image - Admin: Upload contributor profile photo from computer
+ * POST /api/jugarris/upload-image - Admin: Upload contributor profile photo
+ * Uses Cloudinary CDN if credentials exist in env, otherwise falls back to local disk storage.
  */
 router.post("/upload-image", (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(401).json({ error: "Unauthorized. Invalid admin password." });
   }
 
-  profileUpload.single("image")(req, res, (err) => {
+  const useCloudinary = isCloudinaryConfigured();
+  const uploadMiddleware = useCloudinary
+    ? profileUploadMemory.single("image")
+    : profileUploadDisk.single("image");
+
+  uploadMiddleware(req, res, async (err) => {
     if (err) {
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE") {
@@ -80,14 +97,35 @@ router.post("/upload-image", (req, res) => {
       return res.status(400).json({ error: "No image file uploaded." });
     }
 
-    const relativeUrl = `/uploads/profiles/${req.file.filename}`;
-    res.json({
-      success: true,
-      url: relativeUrl,
-      filename: req.file.filename,
-    });
+    try {
+      if (useCloudinary) {
+        // Upload image buffer directly to Cloudinary
+        const result = await uploadBufferToCloudinary(req.file.buffer, "jugarr_profiles");
+        return res.json({
+          success: true,
+          url: result.url,
+          public_id: result.public_id,
+          provider: "cloudinary",
+        });
+      } else {
+        // Fallback to local uploads directory
+        const relativeUrl = `/uploads/profiles/${req.file.filename}`;
+        return res.json({
+          success: true,
+          url: relativeUrl,
+          filename: req.file.filename,
+          provider: "local",
+        });
+      }
+    } catch (uploadError) {
+      console.error("Image upload processing error:", uploadError);
+      return res.status(500).json({
+        error: uploadError.message || "Failed to process image upload.",
+      });
+    }
   });
 });
+
 
 /**
  * GET /api/jugarris - Public list of active contributors
