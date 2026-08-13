@@ -237,19 +237,31 @@ router.get("/:slug", async (req, res) => {
 
     // Try loading avatar image
     let loadedImage = null;
-    if (contributor?.profileImage) {
+    let targetImgUrl = contributor?.profileImage || "";
+    const nameLower = (name || "").toLowerCase();
+
+    if (nameLower.includes("sagar") && (!targetImgUrl || targetImgUrl.startsWith("/uploads"))) {
+      targetImgUrl = "https://github.com/SagarDevop.png";
+    } else if (nameLower.includes("prince") && (!targetImgUrl || targetImgUrl.startsWith("/uploads"))) {
+      targetImgUrl = "https://github.com/prince-mishra-09.png";
+    }
+
+    if (targetImgUrl) {
       try {
-        const imgPathOrUrl = contributor.profileImage;
-        if (imgPathOrUrl.startsWith("/uploads/")) {
-          const localPath = path.join(process.cwd(), imgPathOrUrl);
+        if (targetImgUrl.startsWith("/uploads/")) {
+          const localPath = path.join(process.cwd(), targetImgUrl);
           if (fs.existsSync(localPath)) {
             loadedImage = await loadImage(localPath);
+          } else {
+            // Local upload missing on Render disk: use UI-Avatars fallback
+            targetImgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=10B981&color=fff&bold=true&size=400`;
           }
-        } else if (imgPathOrUrl.startsWith("http")) {
-          // Fetch remote image with timeout
+        }
+        
+        if (!loadedImage && targetImgUrl.startsWith("http")) {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), 3000);
-          const response = await fetch(imgPathOrUrl, { signal: controller.signal });
+          const response = await fetch(targetImgUrl, { signal: controller.signal });
           clearTimeout(timer);
           if (response.ok) {
             const arrayBuffer = await response.arrayBuffer();

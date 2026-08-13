@@ -184,6 +184,26 @@ export default function JugarrProfilePage() {
     { label: "Website", url: person.website, icon: "website" },
   ].filter((s) => Boolean(s.url));
 
+  const getProfileImageSrc = (p) => {
+    if (!p) return "https://ui-avatars.com/api/?name=Jugarr&background=10B981&color=fff&bold=true&size=400";
+    const nameLower = (p.name || "").toLowerCase();
+    if (nameLower.includes("sagar")) {
+      return "https://github.com/SagarDevop.png";
+    }
+    if (nameLower.includes("prince")) {
+      return "https://github.com/prince-mishra-09.png";
+    }
+    if (p.profileImage) {
+      if (p.profileImage.startsWith("http://") || p.profileImage.startsWith("https://")) {
+        return p.profileImage;
+      }
+      if (p.profileImage.startsWith("/uploads")) {
+        return `${API_BASE}${p.profileImage}`;
+      }
+    }
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name || "Jugarr")}&background=10B981&color=fff&bold=true&size=400`;
+  };
+
   return (
     <>
       <Header />
@@ -205,9 +225,13 @@ export default function JugarrProfilePage() {
             <div className="profile-hero-card">
               <div className="profile-hero-avatar-wrapper">
                 <img
-                  src={person.profileImage ? (person.profileImage.startsWith("/uploads") ? `${API_BASE}${person.profileImage}` : person.profileImage) : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
+                  src={getProfileImageSrc(person)}
                   alt={person.name}
                   className="profile-hero-avatar"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name || "Jugarr")}&background=10B981&color=fff&bold=true&size=400`;
+                  }}
                 />
               </div>
 
