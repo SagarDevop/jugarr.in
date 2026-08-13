@@ -94,6 +94,18 @@ connectToDatabase()
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
+
+    // DB Keep-Alive Daemon — starts automatically on boot.
+    // Touches MongoDB every 4 min so Atlas M0 never auto-pauses.
+    // No dependency on /api/ping being called first.
+    setInterval(async () => {
+      try {
+        await connectToDatabase();
+        console.log("[Keep-Alive] DB ping OK");
+      } catch (err) {
+        console.error("[Keep-Alive] DB ping failed:", err.message);
+      }
+    }, 4 * 60 * 1000); // 4 minutes
   })
   .catch((err) => {
     console.error("Database connection failed. Exiting...", err);
