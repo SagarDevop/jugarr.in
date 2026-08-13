@@ -1,0 +1,418 @@
+/* Jugarr Identity Card Modal Styles - Golden Achievement Card Design */
+
+.card-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Card Holder Container - Website Black & White Square-Wise Theme */
+.card-modal-container {
+  background: #000000;
+  border: 1px solid #27272a;
+  border-radius: 14px;
+  padding: 24px;
+  max-width: 440px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-modal-topbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-modal-badge {
+  background: #18181b;
+  color: #ffffff;
+  border: 1px solid #3f3f46;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.card-modal-close {
+  background: #18181b;
+  color: #a1a1aa;
+  border: 1px solid #27272a;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.card-modal-close:hover {
+  background: #27272a;
+  color: #ffffff;
+  border-color: #3f3f46;
+}
+
+/* 1:1 Identity Card Display inside Holder */
+.jugarr-id-card-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.jugarr-id-card {
+  width: 100%;
+  max-width: 380px;
+  min-height: 580px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 28px;
+  padding: 26px 24px 24px 24px;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Top Header: Prominent Mascot & Text */
+.id-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.id-card-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.id-card-mascot {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.id-card-logo-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.5px;
+}
+
+.id-card-role {
+  font-size: 17px;
+  font-weight: 700;
+  color: #f97316;
+  letter-spacing: 0.3px;
+}
+
+/* Avatar Circle */
+.id-card-avatar-container {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.id-card-avatar-ring {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 5px solid #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.id-card-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Info Section */
+.id-card-info {
+  text-align: center;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.id-card-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+/* Short Bio: Full description cleanly displayed */
+.id-card-bio {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+  padding: 0 6px;
+}
+
+/* GOLDEN ACHIEVEMENT BADGE CONTAINER (Matching Reference Image) */
+.id-card-achievement-box {
+  width: 100%;
+  background: #fffdf0;
+  border: 1.5px solid #fde68a;
+  border-radius: 16px;
+  padding: 24px 16px 14px 16px;
+  margin-top: 20px;
+  margin-bottom: auto;
+  position: relative;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.id-card-achievement-seal {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #eab308;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.wreath-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  opacity: 0.85;
+}
+
+.wreath-left {
+  left: 12px;
+}
+
+.wreath-right {
+  right: 12px;
+}
+
+.id-card-achievement-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #d97706;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.id-card-achievement-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.id-card-achievement-tagline {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.id-card-achievement-stars {
+  color: #eab308;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+/* Middle 2 Column Grid - Positioned at Bottom */
+.id-card-grid {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  margin-bottom: 18px;
+}
+
+.id-card-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.id-card-joined-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.id-card-cal-box {
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.id-card-joined-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.id-card-divider {
+  width: 1px;
+  height: 85px;
+  background: #f1f5f9;
+}
+
+.id-card-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.id-card-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.id-card-qr-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.id-card-qr-img {
+  width: 76px;
+  height: 76px;
+  display: block;
+}
+
+/* Footer Horizontal Line */
+.id-card-footer-line {
+  width: 100%;
+  height: 1px;
+  background: #f1f5f9;
+  margin-bottom: 16px;
+}
+
+/* Footer Text */
+.id-card-footer {
+  text-align: center;
+}
+
+.id-card-footer-sub {
+  font-size: 12.5px;
+  color: #64748b;
+  margin: 0 0 3px 0;
+}
+
+.id-card-footer-url {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f97316;
+  margin: 0;
+}
+
+/* Website Themed Black & White Download Button */
+.card-modal-actions {
+  width: 100%;
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-download-card {
+  width: 100%;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-download-card:hover {
+  background: #f4f4f5;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(255, 255, 255, 0.15);
+}
+
+.btn-download-card:active {
+  transform: translateY(0);
+}
+
+.btn-download-card:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

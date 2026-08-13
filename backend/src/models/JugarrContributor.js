@@ -65,6 +65,16 @@ const JugarrContributorSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    badge: {
+      type: String,
+      default: "🏆 Founding Contributor",
+      trim: true,
+    },
+    contributorNumber: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     joinedDate: {
       type: String,
       default: () =>

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
 import PageLoader from "@/components/PageLoader.jsx";
+import JugarrCardModal from "@/components/JugarrCardModal.jsx";
 import { useSEO } from "@/hooks/useSEO.js";
 import { getApiBaseUrl } from "@/lib/api.js";
 
@@ -12,6 +13,8 @@ export default function JugarrProfilePage() {
 
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+
 
   useEffect(() => {
     fetch(`${API_BASE}/api/jugarris/${slug}`)
@@ -180,23 +183,8 @@ export default function JugarrProfilePage() {
                 <h1 className="profile-hero-name font-display">{person.name}</h1>
                 <p className="profile-hero-bio font-body">{person.shortBio}</p>
 
-                {/* Social Quick Bar */}
-                {socialList.length > 0 && (
-                  <div className="profile-hero-socials">
-                    <span className="font-mono text-muted" style={{ fontSize: "12px", textTransform: "uppercase" }}>Connect:</span>
-                    {socialList.map((s) => (
-                      <a
-                        key={s.label}
-                        href={s.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="profile-social-pill font-mono"
-                      >
-                        {s.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
+                {/* Social Quick Bar & Identity Card CTA */}
+                
               </div>
             </div>
           </div>
@@ -249,11 +237,38 @@ export default function JugarrProfilePage() {
                     <span className="font-body font-medium">{person.role || "Contributor"}</span>
                   </div>
                   <div className="profile-stat-row">
+                    <span className="font-mono text-muted">Badge:</span>
+                    <span className="font-body font-medium" style={{ color: "#f97316" }}>{person.badge || "🏆 Founding Contributor"}</span>
+                  </div>
+                  <div className="profile-stat-row">
                     <span className="font-mono text-muted">Member Since:</span>
                     <span className="font-body font-medium">{person.joinedDate || "Day 1"}</span>
                   </div>
 
-                  <h4 className="font-display" style={{ marginTop: "24px", marginBottom: "12px", fontSize: "16px" }}>
+                  <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+                    <button
+                      className="btn-download-card font-display"
+                      onClick={() => setIsCardModalOpen(true)}
+                      style={{
+                        width: "100%",
+                        background: "#000000ff",
+                        color: "#ffffff",
+                        border: "none",
+                        padding: "12px",
+                        borderRadius: "10px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px"
+                      }}
+                    >
+                     Download ID Card
+                    </button>
+                  </div>
+
+                  <h4 className="font-display" style={{ marginTop: "20px", marginBottom: "12px", fontSize: "16px" }}>
                     Connect
                   </h4>
                   <div className="profile-connect-list">
@@ -281,6 +296,14 @@ export default function JugarrProfilePage() {
             </div>
           </div>
         </section>
+
+        {/* Jugarr Identity Card Modal */}
+        <JugarrCardModal
+          person={person}
+          isOpen={isCardModalOpen}
+          onClose={() => setIsCardModalOpen(false)}
+        />
+
 
         {/* Internal Linking & Call to Action */}
         <section className="profile-footer-links-section">

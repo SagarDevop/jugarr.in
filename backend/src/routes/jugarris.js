@@ -5,8 +5,10 @@ import multer from "multer";
 import connectToDatabase from "../lib/mongoose.js";
 import JugarrContributor from "../models/JugarrContributor.js";
 import { uploadBufferToCloudinary, isCloudinaryConfigured } from "../lib/cloudinary.js";
+import { generateContributorCard, invalidateCardCache } from "../lib/cardGenerator.js";
 
 const router = Router();
+
 
 // Ensure profiles upload directory exists (for fallback disk storage)
 const PROFILES_UPLOAD_DIR = path.join(process.cwd(), "uploads", "profiles");
@@ -189,6 +191,43 @@ router.get("/", async (req, res) => {
 });
 
 /**
+ * GET /api/jugarris/:slug/card - Downloadable high-res PNG identity card
+ */
+router.get("/:slug/card", async (req, res) => {
+  try {
+    await connectToDatabase();
+
+    const { slug } = req.params;
+    const contributor = await JugarrContributor.findOne({ slug: slug.toLowerCase() }).lean();
+
+    if (!contributor) {
+      return res.status(404).json({ error: "Contributor profile not found." });
+    }
+
+    const pngBuffer = await generateContributorCard(contributor);
+
+    const isDownload = req.query.download === "true" || req.query.download === "1";
+    const filename = `jugarr-${contributor.slug}-card.png`;
+
+    res.set({
+      "Content-Type": "image/png",
+      "Content-Length": pngBuffer.length,
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "Content-Disposition": isDownload
+        ? `attachment; filename="${filename}"`
+        : `inline; filename="${filename}"`,
+    });
+
+    return res.send(pngBuffer);
+  } catch (error) {
+    console.error("Error generating contributor identity card:", error);
+    return res.status(500).json({ error: "Failed to generate contributor identity card." });
+  }
+});
+
+/**
  * GET /api/jugarris/:slug - Public lookup single contributor by slug
  */
 router.get("/:slug", async (req, res) => {
@@ -233,6 +272,8 @@ router.post("/", async (req, res) => {
       shortBio,
       longBio,
       journey,
+      badge,
+      contributorNumber,
       linkedin,
       instagram,
       github,
@@ -266,6 +307,8 @@ router.post("/", async (req, res) => {
       shortBio: shortBio.trim(),
       longBio: (longBio || "").trim(),
       journey: (journey || "").trim(),
+      badge: (badge || "🏆 Founding Contributor").trim(),
+      contributorNumber: (contributorNumber || "").trim(),
       linkedin: (linkedin || "").trim(),
       instagram: (instagram || "").trim(),
       github: (github || "").trim(),
@@ -309,6 +352,8 @@ router.put("/:id", async (req, res) => {
       shortBio,
       longBio,
       journey,
+      badge,
+      contributorNumber,
       linkedin,
       instagram,
       github,
@@ -325,6 +370,8 @@ router.put("/:id", async (req, res) => {
     if (shortBio !== undefined) contributor.shortBio = shortBio.trim();
     if (longBio !== undefined) contributor.longBio = longBio.trim();
     if (journey !== undefined) contributor.journey = journey.trim();
+    if (badge !== undefined) contributor.badge = badge.trim();
+    if (contributorNumber !== undefined) contributor.contributorNumber = contributorNumber.trim();
     if (linkedin !== undefined) contributor.linkedin = linkedin.trim();
     if (instagram !== undefined) contributor.instagram = instagram.trim();
     if (github !== undefined) contributor.github = github.trim();
@@ -340,9 +387,11 @@ router.put("/:id", async (req, res) => {
       if (duplicate) {
         return res.status(400).json({ error: `Slug '${formattedSlug}' is already taken.` });
       }
+      invalidateCardCache(contributor.slug);
       contributor.slug = formattedSlug;
     }
 
+    invalidateCardCache(contributor.slug);
     await contributor.save();
     res.json({ success: true, contributor });
   } catch (error) {
@@ -350,6 +399,7 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: error.message || "Internal server error." });
   }
 });
+
 
 /**
  * PATCH /api/jugarris/:id/toggle-active - Admin: Quick toggle active status

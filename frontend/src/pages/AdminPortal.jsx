@@ -146,6 +146,8 @@ export default function AdminPortal() {
     slug: "",
     profileImage: "",
     role: "Contributor",
+    badge: "🏆 Founding Contributor",
+    contributorNumber: "",
     shortBio: "",
     longBio: "",
     journey: "",
@@ -204,6 +206,8 @@ export default function AdminPortal() {
       slug: person.slug || "",
       profileImage: person.profileImage || "",
       role: person.role || "Contributor",
+      badge: person.badge || "🏆 Founding Contributor",
+      contributorNumber: person.contributorNumber || "",
       shortBio: person.shortBio || "",
       longBio: person.longBio || "",
       journey: person.journey || "",
@@ -2091,7 +2095,7 @@ export default function AdminPortal() {
                         type="text"
                         value={jugarrisFormData.role}
                         onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, role: e.target.value })}
-                        placeholder="e.g. Founding Contributor"
+                        placeholder="e.g. Founder"
                         style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
                       />
                     </div>
@@ -2101,11 +2105,35 @@ export default function AdminPortal() {
                         type="text"
                         value={jugarrisFormData.joinedDate}
                         onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, joinedDate: e.target.value })}
-                        placeholder="e.g. Aug 2024"
+                        placeholder="e.g. Aug 2026"
                         style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
                       />
                     </div>
                   </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "12px" }}>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>ID Card Badge</label>
+                      <input
+                        type="text"
+                        value={jugarrisFormData.badge}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, badge: e.target.value })}
+                        placeholder="e.g. 🏆 Founding Contributor"
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono" style={{ fontSize: "12px" }}>Contributor # (Optional)</label>
+                      <input
+                        type="text"
+                        value={jugarrisFormData.contributorNumber}
+                        onChange={(e) => setJugarrisFormData({ ...jugarrisFormData, contributorNumber: e.target.value })}
+                        placeholder="e.g. #001"
+                        style={{ width: "100%", padding: "8px", marginTop: "4px", border: "1px solid var(--color-outline-variant)", borderRadius: "4px" }}
+                      />
+                    </div>
+                  </div>
+
 
                   <div>
                     <label className="font-mono" style={{ fontSize: "12px", display: "block", marginBottom: "6px" }}>
