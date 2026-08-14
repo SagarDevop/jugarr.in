@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import jugguImg from "../assets/jugguu.png";
 import "./JugarrCardModal.css";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+import { getApiBaseUrl } from "@/lib/api.js";
 
 export default function JugarrCardModal({ person, isOpen, onClose }) {
   const [downloading, setDownloading] = useState(false);
+  const API_BASE = getApiBaseUrl();
 
   if (!isOpen || !person) return null;
 

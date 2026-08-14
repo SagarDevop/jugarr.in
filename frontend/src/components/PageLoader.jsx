@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getApiBaseUrl } from "@/lib/api.js";
 
 export default function PageLoader() {
   const [progress, setProgress] = useState(0);
@@ -12,7 +13,7 @@ export default function PageLoader() {
     document.body.style.overflow = "hidden";
 
     // Kickoff server-side keep-alive self-pinging loop
-    fetch(`${import.meta.env.VITE_API_URL}/api/ping`).catch((err) => console.error("Keep-alive kickoff failed:", err));
+    fetch(`${getApiBaseUrl()}/api/ping`).catch((err) => console.error("Keep-alive kickoff failed:", err));
 
     // Dynamic, organic progress increment
     const interval = setInterval(() => {

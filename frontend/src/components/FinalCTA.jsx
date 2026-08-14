@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getApiBaseUrl } from "@/lib/api.js";
 
 export default function FinalCTA() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function FinalCTA() {
       return;
     }
     const controller = new AbortController();
-    fetch(`${import.meta.env.VITE_API_URL}/api/waitlist/referrer?code=${encodeURIComponent(referredBy.trim().toUpperCase())}`, { signal: controller.signal })
+    fetch(`${getApiBaseUrl()}/api/waitlist/referrer?code=${encodeURIComponent(referredBy.trim().toUpperCase())}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error("Referrer not found");
         return res.json();
@@ -52,7 +53,7 @@ export default function FinalCTA() {
       setWaitlistCount(parseInt(saved, 10));
     }
     
-    fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in-zytm.onrender.com"}/api/waitlist`)
+    fetch(`${getApiBaseUrl()}/api/waitlist`)
       .then((res) => res.json())
       .then((data) => {
         if (data && typeof data.count === "number") {
@@ -98,7 +99,7 @@ export default function FinalCTA() {
     }
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://jugarr-in-zytm.onrender.com"}/api/waitlist`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/waitlist`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

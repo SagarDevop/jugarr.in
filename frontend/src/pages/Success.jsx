@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
 import { useSEO } from "@/hooks/useSEO.js";
+import { getApiBaseUrl } from "@/lib/api.js";
 import rewardsImg from "@/assets/referral_rewards.png";
 
 const MOCK_EVENTS = [
@@ -44,7 +45,7 @@ export default function Success() {
     }
 
     const fetchStatus = () => {
-      fetch(`${import.meta.env.VITE_API_URL}/api/waitlist/status?email=${encodeURIComponent(email)}`)
+      fetch(`${getApiBaseUrl()}/api/waitlist/status?email=${encodeURIComponent(email)}`)
         .then((res) => {
           if (!res.ok) {
             throw new Error("Failed to find waitlist details. Make sure your email is registered.");
