@@ -2694,6 +2694,13 @@ footer {
   color: var(--color-on-surface-variant, #4b5563);
   line-height: 1.5;
   margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .jugarris-card-footer {
