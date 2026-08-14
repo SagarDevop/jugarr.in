@@ -186,6 +186,12 @@
   margin: 0;
   line-height: 1.45;
   padding: 0 6px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* GOLDEN ACHIEVEMENT BADGE CONTAINER (Matching Reference Image) */
