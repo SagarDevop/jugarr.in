@@ -10,6 +10,7 @@ import Success from "./pages/Success.jsx";
 import AdminPortal from "./pages/AdminPortal.jsx";
 import JugarrisIndex from "./pages/JugarrisIndex.jsx";
 import JugarrProfilePage from "./pages/JugarrProfilePage.jsx";
+import AzaadBharat from "./pages/AzaadBharat.jsx";
 
 export default function App() {
   const { pathname, hash } = useLocation();
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/meet-the-jugarris/:slug" element={<JugarrProfilePage />} />
         <Route path="/success" element={<Success />} />
         <Route path="/admin" element={<AdminPortal />} />
+        <Route path="/azaad-bharat" element={<AzaadBharat />} />
       </Routes>
     </WaitlistProvider>
   );

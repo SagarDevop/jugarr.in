@@ -10,8 +10,8 @@ import adminRoutes from "./routes/admin.js";
 import sitemapRoutes from "./routes/sitemap.js";
 
 import careersRoutes from "./routes/careers.js";
-
 import jugarrisRoutes from "./routes/jugarris.js";
+import visitorsRoutes from "./routes/visitors.js";
 
 import path from "path";
 
@@ -26,9 +26,11 @@ const defaultAllowedOrigins = [
   "https://www.jugarr.in",
   "https://jugarr-in.vercel.app",
   "http://localhost:3000",
+  "http://localhost:3001",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
   "http://127.0.0.1:5173",
 ];
 
@@ -87,6 +89,7 @@ app.use("/api/waitlist", waitlistRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/jugarris", jugarrisRoutes);
+app.use("/api/visitors", visitorsRoutes);
 app.use("/api", careersRoutes);
 app.use("/sitemap.xml", sitemapRoutes);
 
