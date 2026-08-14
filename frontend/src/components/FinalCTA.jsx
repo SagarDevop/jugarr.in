@@ -78,7 +78,65 @@ export default function FinalCTA() {
     }
   };
 
-  const handleNext = () => {
+  const [quickLookupEmail, setQuickLookupEmail] = useState("");
+  const [quickLookupLoading, setQuickLookupLoading] = useState(false);
+  const [quickLookupError, setQuickLookupError] = useState("");
+  const [showQuickLookup, setShowQuickLookup] = useState(false);
+
+  // Check if an email already exists in backend database
+  const checkExistingUser = async (emailToCheck) => {
+    if (!emailToCheck || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToCheck.trim())) return false;
+    try {
+      const res = await fetch(
+        `${getApiBaseUrl()}/api/waitlist/status?email=${encodeURIComponent(emailToCheck.trim().toLowerCase())}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.referralCode) {
+          saveUser(data);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn("User lookup check error:", e);
+    }
+    return false;
+  };
+
+  const handleEmailBlur = async () => {
+    if (email.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      await checkExistingUser(email);
+    }
+  };
+
+  const handleQuickLookup = async (e) => {
+    e.preventDefault();
+    if (!quickLookupEmail.trim()) return;
+
+    setQuickLookupLoading(true);
+    setQuickLookupError("");
+
+    try {
+      const res = await fetch(
+        `${getApiBaseUrl()}/api/waitlist/status?email=${encodeURIComponent(quickLookupEmail.trim().toLowerCase())}`
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setQuickLookupError(data.error || "No waitlist account found for this email.");
+        setQuickLookupLoading(false);
+        return;
+      }
+
+      saveUser(data);
+      setQuickLookupLoading(false);
+    } catch (err) {
+      console.error("Quick lookup error:", err);
+      setQuickLookupError("Network error. Please try again.");
+      setQuickLookupLoading(false);
+    }
+  };
+
+  const handleNext = async () => {
     if (!name.trim()) {
       alert("Please enter your full name.");
       return;
@@ -99,6 +157,13 @@ export default function FinalCTA() {
       alert("Please enter your graduation passout year.");
       return;
     }
+
+    // Instant check: If old user already joined, immediately log them in!
+    const alreadyExists = await checkExistingUser(email);
+    if (alreadyExists) {
+      return;
+    }
+
     setStep(2);
   };
 
@@ -316,6 +381,98 @@ export default function FinalCTA() {
                 `${waitlistCount}+ students from colleges across India have already joined. Be among the first to buy, sell, and earn on your campus.`
               )}
             </p>
+
+            {/* Quick Check for Old / Existing Waitlist Members */}
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: "24px",
+              gap: "8px",
+            }}>
+              <span className="font-mono" style={{ fontSize: "12px", color: "var(--color-outline)" }}>
+                Already joined the waitlist?
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowQuickLookup(!showQuickLookup)}
+                className="font-mono"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: "1px solid var(--color-primary)",
+                  color: "var(--color-primary)",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  padding: "0 2px",
+                }}
+              >
+                {showQuickLookup ? "✕ Close Quick Check" : "Check Your Rank & Referrals \u2192"}
+              </button>
+            </div>
+
+            {showQuickLookup && (
+              <div style={{
+                border: "1px solid var(--color-primary)",
+                boxShadow: "6px 6px 0px 0px var(--color-yellow-accent)",
+                backgroundColor: "var(--color-surface-lowest)",
+                padding: "24px",
+                maxWidth: "520px",
+                margin: "0 auto 32px",
+                textAlign: "left",
+              }}>
+                <span className="font-mono text-outline" style={{ fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", display: "block", marginBottom: "8px" }}>
+                  WAITLIST MEMBER ACCESS
+                </span>
+                <h3 className="font-display" style={{ fontSize: "20px", marginBottom: "8px" }}>
+                  Retrieve Your Referral Dashboard
+                </h3>
+                <p className="font-body text-muted" style={{ fontSize: "13px", marginBottom: "16px" }}>
+                  Enter your registered email below to instantly view your queue rank, rewards, and custom referral link.
+                </p>
+                <form onSubmit={handleQuickLookup} style={{ display: "flex", border: "1px solid var(--color-primary)", backgroundColor: "var(--color-surface-low)" }}>
+                  <input
+                    type="email"
+                    placeholder="ENTER YOUR REGISTERED EMAIL"
+                    value={quickLookupEmail}
+                    onChange={(e) => setQuickLookupEmail(e.target.value)}
+                    style={{
+                      flexGrow: 1,
+                      padding: "12px 14px",
+                      border: "none",
+                      background: "transparent",
+                      fontFamily: "var(--font-jetbrains), monospace",
+                      fontSize: "12px",
+                      outline: "none",
+                      color: "var(--color-primary)",
+                    }}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={quickLookupLoading}
+                    className="font-mono"
+                    style={{
+                      backgroundColor: "var(--color-primary)",
+                      color: "var(--color-on-primary)",
+                      border: "none",
+                      padding: "0 18px",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {quickLookupLoading ? "CHECKING..." : "ACCESS \u2192"}
+                  </button>
+                </form>
+                {quickLookupError && (
+                  <p className="font-mono" style={{ color: "#ff3b30", fontSize: "11px", marginTop: "8px" }}>
+                    {quickLookupError}
+                  </p>
+                )}
+              </div>
+            )}
             
             <form className="cta-form-stacked" onSubmit={handleSubmit}>
               {/* Progress / Step indicator header */}
@@ -343,6 +500,7 @@ export default function FinalCTA() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={handleEmailBlur}
                     required
                   />
                   <input
