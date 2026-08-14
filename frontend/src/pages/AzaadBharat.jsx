@@ -198,7 +198,7 @@ function AzaadBharatInner() {
       <style>{CSS}</style>
       <div className="ab-wrap" onClick={unlock}>
 
-        {/* ── BG: bharat.png full-bleed with mask edges */}
+        {/* ── BG: bharat.webp full-bleed with mask edges */}
         <div className="ab-bg-img" />
 
         {/* ── dark overlay */}
@@ -323,10 +323,10 @@ const CSS = `
   grid-template-columns: 1fr;
 }
 
-/* ── BACKGROUND — bharat.png full screen, edges fade via mask */
+/* ── BACKGROUND — bharat.webp full screen, edges fade via mask */
 .ab-bg-img {
   position: absolute; inset: 0; z-index: 0;
-  background: url('/bharat.png') center 44% / cover no-repeat;
+  background: url('/bharat.webp') center 44% / cover no-repeat;
   /* Subtle edge fade — keeps full screen but softens hard corners */
   -webkit-mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, black 40%, transparent 95%);
   mask-image:         radial-gradient(ellipse 95% 95% at 50% 50%, black 40%, transparent 95%);
