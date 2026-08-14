@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useWaitlist } from "@/context/WaitlistContext.jsx";
+import { getApiBaseUrl } from "@/lib/api.js";
 import logoImg from "@/assets/logo.png";
 
 export default function Header() {
@@ -9,6 +10,8 @@ export default function Header() {
   const { isJoined, user } = useWaitlist();
   const [activeHash, setActiveHash] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const ctaButtonText = isJoined ? "See Your Referrals" : "Join Free Waitlist";
 
   useEffect(() => {
     if (location.pathname.startsWith("/blog")) {
