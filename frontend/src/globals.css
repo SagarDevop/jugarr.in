@@ -105,6 +105,12 @@ html, body {
   margin: 12px 0;
 }
 
+@media (max-width: 767px) {
+  .editorial-line {
+    margin: 8px 0;
+  }
+}
+
 .border-sharp {
   border: 1px solid var(--color-primary);
 }
@@ -189,6 +195,13 @@ html, body {
   transform: rotate(-5deg) scale(1.05);
 }
 
+/* Hide "Jugarr" text on mobile, show only logo image */
+@media (max-width: 767px) {
+  .logo span {
+    display: none;
+  }
+}
+
 .nav-links {
   display: none;
   gap: var(--gutter);
@@ -222,6 +235,136 @@ html, body {
   padding-bottom: 4px;
 }
 
+/* Navbar right side wrapper */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* CTA button — smaller on mobile */
+.navbar-cta {
+  font-size: 11px;
+  padding: 8px 14px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .navbar-cta {
+    font-size: inherit;
+    padding: 10px 20px;
+    letter-spacing: inherit;
+  }
+}
+
+/* Hamburger button — mobile only */
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  align-self: stretch;
+  background: transparent;
+  border: 1px solid var(--color-outline-variant);
+  cursor: pointer;
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none;
+  }
+}
+
+.hamburger-bar {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  transform-origin: center;
+}
+
+/* Animate to X when open */
+.hamburger-btn.open .hamburger-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger-btn.open .hamburger-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburger-btn.open .hamburger-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile dropdown menu */
+.nav-mobile-menu {
+  display: block;
+  overflow: hidden;
+  max-height: 0;
+  background-color: var(--color-surface-lowest);
+  border-top: 1px solid var(--color-outline-variant);
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-mobile-menu.open {
+  max-height: 400px;
+}
+
+@media (min-width: 768px) {
+  .nav-mobile-menu {
+    display: none !important;
+  }
+}
+
+.nav-mobile-links {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.nav-mobile-link {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-mobile-link:last-child {
+  border-bottom: none;
+}
+
+.nav-mobile-link:hover,
+.nav-mobile-link:active {
+  background-color: var(--color-surface-low);
+  color: var(--color-primary);
+}
+
+.nav-mobile-link.active {
+  color: var(--color-primary);
+  background-color: var(--color-surface-low);
+}
+
+.nav-mobile-footer {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--color-outline-variant);
+}
+
+
+
 /* Main Layout Padding */
 main {
   padding-top: 72px;
@@ -234,14 +377,16 @@ main {
   flex-direction: column;
   justify-content: center;
   gap: var(--gutter);
-  padding-top: var(--stack-lg);
-  padding-bottom: var(--stack-lg);
+  padding-top: 32px;
+  padding-bottom: 32px;
 }
 
 @media (min-width: 768px) {
   .hero {
     flex-direction: row;
     align-items: center;
+    padding-top: var(--stack-lg);
+    padding-bottom: var(--stack-lg);
   }
 }
 
@@ -250,6 +395,12 @@ main {
   display: flex;
   flex-direction: column;
   gap: var(--stack-md);
+}
+
+@media (max-width: 767px) {
+  .hero-content {
+    gap: 16px;
+  }
 }
 
 .hero-title {
@@ -263,6 +414,12 @@ main {
 .hero-title-segment {
   display: inline-block;
   white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .hero-title-segment {
+    white-space: normal;
+  }
 }
 
 @media (max-width: 400px) {
@@ -2466,6 +2623,20 @@ footer {
   transition: all 0.15s ease-in-out;
   width: fit-content;
   user-select: none;
+}
+
+/* Mobile: tighter, full-width, compact */
+@media (max-width: 767px) {
+  .hero-referral-badge {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    box-shadow: 3px 3px 0px 0px var(--color-primary);
+    justify-content: flex-start;
+  }
 }
 
 .hero-referral-badge:hover {
