@@ -1,12 +1,30 @@
 import heroImg from "@/assets/hero1.png";
 import { useNavigate } from "react-router-dom";
+import { useWaitlist } from "@/context/WaitlistContext.jsx";
 
 export default function Hero() {
   const navigate = useNavigate();
+  const { isJoined, user } = useWaitlist();
   
   const scrollToSection = (selector) => {
     const el = document.querySelector(selector);
     if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleBadgeClick = () => {
+    if (isJoined && user?.email) {
+      navigate(`/success?email=${encodeURIComponent(user.email)}`);
+    } else {
+      navigate("/success");
+    }
+  };
+
+  const handlePrimaryClick = () => {
+    if (isJoined && user?.email) {
+      navigate(`/success?email=${encodeURIComponent(user.email)}`);
+    } else {
+      scrollToSection(".cta-section");
+    }
   };
 
   return (
@@ -14,10 +32,14 @@ export default function Hero() {
       <div className="hero-content">
         <div 
           className="hero-referral-badge"
-          onClick={() => navigate("/success")}
+          onClick={handleBadgeClick}
         >
           <span className="live-pulse"></span>
-          <span>🔥 Free Merch Alert: Get T-Shirt, Notebook & Pen! Invite friends to climb rank &rarr;</span>
+          <span>
+            {isJoined
+              ? `🎉 You're in the queue ${user?.rank ? `(#${user.rank})` : ""}! Tap to view your referrals & rewards \u2192`
+              : "🔥 Free Merch Alert: Get T-Shirt, Notebook & Pen! Invite friends to climb rank \u2192"}
+          </span>
         </div>
         <div className="editorial-line"></div>
         <h1 className="hero-title">
@@ -29,8 +51,8 @@ export default function Hero() {
           Buy and sell books, notes, gadgets, and furniture. Find internships, offer services, and earn — all within your college campus.
         </p>
         <div className="hero-actions">
-          <button className="btn btn-primary" onClick={() => scrollToSection(".cta-section")}>
-            Join the Waitlist — It&apos;s Free
+          <button className="btn btn-primary" onClick={handlePrimaryClick}>
+            {isJoined ? "See Your Referrals \u2192" : "Join the Waitlist — It\u2019s Free"}
           </button>
           <button className="btn btn-secondary" onClick={() => scrollToSection("#how-it-works")}>
             See How It Works

@@ -5,10 +5,12 @@ import Footer from "@/components/Footer.jsx";
 import { blogPosts as fallbackPosts } from "@/data/posts.js";
 import { useSEO } from "@/hooks/useSEO.js";
 import { getApiBaseUrl } from "@/lib/api.js";
+import { useWaitlist } from "@/context/WaitlistContext.jsx";
 
 export default function BlogPostPage() {
   const API_BASE = getApiBaseUrl();
   const { slug } = useParams();
+  const { isJoined, user } = useWaitlist();
   const fallbackPost = fallbackPosts.find((p) => p.slug === slug);
   
   const [post, setPost] = useState(fallbackPost || null);
@@ -191,13 +193,23 @@ export default function BlogPostPage() {
                     Join verified students from your college on Jugarr. List your old textbooks, trade study notes, sell hostel essentials, or offer your skills without any platform fees.
                   </p>
                   <div>
-                    <Link
-                      to="/#cta"
-                      className="btn btn-primary"
-                      style={{ textDecoration: "none" }}
-                    >
-                      Join Jugarr Waitlist — Free &rarr;
-                    </Link>
+                    {isJoined && user?.email ? (
+                      <Link
+                        to={`/success?email=${encodeURIComponent(user.email)}`}
+                        className="btn btn-primary"
+                        style={{ textDecoration: "none" }}
+                      >
+                        See Your Referrals &amp; Rewards &rarr;
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/#cta"
+                        className="btn btn-primary"
+                        style={{ textDecoration: "none" }}
+                      >
+                        Join Jugarr Waitlist — Free &rarr;
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

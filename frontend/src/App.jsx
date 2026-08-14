@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import { WaitlistProvider } from "./context/WaitlistContext.jsx";
 import Home from "./pages/Home.jsx";
 import BlogIndex from "./pages/BlogIndex.jsx";
 import BlogPostPage from "./pages/BlogPostPage.jsx";
@@ -45,16 +46,18 @@ export default function App() {
   }, [pathname, hash]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/blog" element={<BlogIndex />} />
-      <Route path="/blog/:slug" element={<BlogPostPage />} />
-      <Route path="/careers" element={<CareersIndex />} />
-      <Route path="/careers/:slug" element={<JobDetailPage />} />
-      <Route path="/meet-the-jugarris" element={<JugarrisIndex />} />
-      <Route path="/meet-the-jugarris/:slug" element={<JugarrProfilePage />} />
-      <Route path="/success" element={<Success />} />
-      <Route path="/admin" element={<AdminPortal />} />
-    </Routes>
+    <WaitlistProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/careers" element={<CareersIndex />} />
+        <Route path="/careers/:slug" element={<JobDetailPage />} />
+        <Route path="/meet-the-jugarris" element={<JugarrisIndex />} />
+        <Route path="/meet-the-jugarris/:slug" element={<JugarrProfilePage />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/admin" element={<AdminPortal />} />
+      </Routes>
+    </WaitlistProvider>
   );
 }

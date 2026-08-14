@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header.jsx";
 import Footer from "@/components/Footer.jsx";
 import { useSEO } from "@/hooks/useSEO.js";
 import { getApiBaseUrl } from "@/lib/api.js";
+import { useWaitlist } from "@/context/WaitlistContext.jsx";
 import rewardsImg from "@/assets/referral_rewards.png";
 
 const MOCK_EVENTS = [
@@ -18,13 +19,23 @@ const MOCK_EVENTS = [
 ];
 
 export default function Success() {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || "";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user: contextUser, saveUser } = useWaitlist();
+
+  const queryEmail = searchParams.get("email") || "";
+  const effectiveEmail = (queryEmail || contextUser?.email || "").trim().toLowerCase();
+
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(effectiveEmail));
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [currentEventIdx, setCurrentEventIdx] = useState(0);
+
+  // Email lookup input state for guest view / cross-device recovery
+  const [lookupEmail, setLookupEmail] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState("");
 
   useEffect(() => {
     const eventInterval = setInterval(() => {
@@ -38,36 +49,73 @@ export default function Success() {
     description: "Check your waitlist rank, copy your custom referral link, and share to move up the campus queue.",
   });
 
-  useEffect(() => {
-    if (!email) {
+  const fetchStatus = useCallback((emailToFetch) => {
+    if (!emailToFetch) {
       setLoading(false);
       return;
     }
 
-    const fetchStatus = () => {
-      fetch(`${getApiBaseUrl()}/api/waitlist/status?email=${encodeURIComponent(email)}`)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Failed to find waitlist details. Make sure your email is registered.");
-          }
-          return res.json();
-        })
-        .then((status) => {
-          setData(status);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching waitlist status:", err);
-          setError(err.message || "Failed to load waitlist status.");
-          setLoading(false);
-        });
-    };
+    fetch(`${getApiBaseUrl()}/api/waitlist/status?email=${encodeURIComponent(emailToFetch)}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to find waitlist details. Make sure your email is registered.");
+        }
+        return res.json();
+      })
+      .then((status) => {
+        setData(status);
+        saveUser(status);
+        setError("");
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching waitlist status:", err);
+        setError(err.message || "Failed to load waitlist status.");
+        setLoading(false);
+      });
+  }, [saveUser]);
 
-    fetchStatus();
+  useEffect(() => {
+    if (!effectiveEmail) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    fetchStatus(effectiveEmail);
     // Poll status every 30 seconds to show live rank updates if someone signs up
-    const interval = setInterval(fetchStatus, 30000);
+    const interval = setInterval(() => fetchStatus(effectiveEmail), 30000);
     return () => clearInterval(interval);
-  }, [email]);
+  }, [effectiveEmail, fetchStatus]);
+
+  const handleLookupSubmit = async (e) => {
+    e.preventDefault();
+    if (!lookupEmail.trim()) return;
+    
+    setLookupLoading(true);
+    setLookupError("");
+
+    try {
+      const res = await fetch(
+        `${getApiBaseUrl()}/api/waitlist/status?email=${encodeURIComponent(lookupEmail.trim().toLowerCase())}`
+      );
+      const resData = await res.json();
+      if (!res.ok) {
+        setLookupError(resData.error || "No waitlist registration found for this email.");
+        setLookupLoading(false);
+        return;
+      }
+
+      setData(resData);
+      saveUser(resData);
+      setSearchParams({ email: resData.email });
+      setLookupLoading(false);
+    } catch (err) {
+      console.error("Lookup error:", err);
+      setLookupError("Failed to verify email. Please check your network and try again.");
+      setLookupLoading(false);
+    }
+  };
 
   const referralLink = data ? `${window.location.origin}?ref=${data.referralCode}` : "";
   const shareText = `Hey! I just joined the waitlist for Jugarr - India's student-to-student campus marketplace. Join with my link so we both climb the queue! 🚀 ${referralLink}`;
@@ -110,9 +158,52 @@ export default function Success() {
         <Header />
         <main style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="container" style={{ textAlign: "center", maxWidth: "500px" }}>
-            <h1 className="font-display" style={{ fontSize: "36px", marginBottom: "16px", color: "var(--color-primary)" }}>Oops!</h1>
-            <p className="font-body text-muted" style={{ marginBottom: "32px", fontSize: "16px" }}>{error || "An unexpected error occurred."}</p>
-            <Link to="/" className="btn btn-primary" style={{ textDecoration: "none" }}>
+            <h1 className="font-display" style={{ fontSize: "36px", marginBottom: "16px", color: "var(--color-primary)" }}>Waitlist Check</h1>
+            <p className="font-body text-muted" style={{ marginBottom: "24px", fontSize: "16px" }}>{error || "Could not find an active waitlist registration."}</p>
+            
+            {/* Direct lookup box in error view */}
+            <form onSubmit={handleLookupSubmit} style={{ marginBottom: "24px" }}>
+              <div style={{ display: "flex", border: "1px solid var(--color-primary)", marginBottom: "12px" }}>
+                <input
+                  type="email"
+                  placeholder="Enter your registered email"
+                  value={lookupEmail}
+                  onChange={(e) => setLookupEmail(e.target.value)}
+                  style={{
+                    flexGrow: 1,
+                    padding: "12px 14px",
+                    border: "none",
+                    background: "var(--color-surface-lowest)",
+                    fontFamily: "var(--font-jetbrains), monospace",
+                    fontSize: "12px",
+                    outline: "none",
+                  }}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="font-mono"
+                  style={{
+                    backgroundColor: "var(--color-primary)",
+                    color: "var(--color-on-primary)",
+                    border: "none",
+                    padding: "0 16px",
+                    cursor: "pointer",
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Find &rarr;
+                </button>
+              </div>
+              {lookupError && (
+                <p className="font-mono" style={{ color: "#ff3b30", fontSize: "11px", textAlign: "left" }}>
+                  {lookupError}
+                </p>
+              )}
+            </form>
+
+            <Link to="/" className="btn btn-secondary font-mono" style={{ textDecoration: "none", fontSize: "12px" }}>
               Back to Home
             </Link>
           </div>
@@ -348,20 +439,72 @@ export default function Success() {
                 Join the waitlist to receive your custom referral link. For every friend who joins through your link, your queue rank is boosted by <strong>2 positions</strong>, bringing you closer to early beta access and exclusive rewards like <strong>Branded T-Shirts, Premium Matte Journals, and Sleek Pens</strong>!
               </p>
 
-              <a
-                href="/?join=true"
-                className="btn btn-primary font-mono"
-                style={{
-                  textDecoration: "none",
-                  display: "inline-block",
-                  fontSize: "13px",
-                  padding: "18px 36px",
-                  width: "100%",
-                  maxWidth: "400px"
-                }}
-              >
-                JOIN WAITLIST & GET REWARDS &rarr;
-              </a>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "center", maxWidth: "420px", margin: "0 auto" }}>
+                <a
+                  href="/?join=true"
+                  className="btn btn-primary font-mono"
+                  style={{
+                    textDecoration: "none",
+                    display: "inline-block",
+                    fontSize: "13px",
+                    padding: "18px 36px",
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  JOIN WAITLIST & GET REWARDS &rarr;
+                </a>
+
+                <div style={{ width: "100%", borderTop: "1px dashed var(--color-primary)", margin: "12px 0" }}></div>
+
+                {/* Email Lookup for returning visitors */}
+                <div style={{ width: "100%", textAlign: "left" }}>
+                  <span className="font-mono" style={{ fontSize: "11px", fontWeight: "bold", display: "block", marginBottom: "8px", color: "var(--color-primary)" }}>
+                    Already joined the waitlist? View your rank:
+                  </span>
+                  <form onSubmit={handleLookupSubmit} style={{ display: "flex", border: "1px solid var(--color-primary)", backgroundColor: "var(--color-surface-low)" }}>
+                    <input
+                      type="email"
+                      placeholder="YOUR REGISTERED EMAIL"
+                      value={lookupEmail}
+                      onChange={(e) => setLookupEmail(e.target.value)}
+                      style={{
+                        flexGrow: 1,
+                        padding: "12px 14px",
+                        border: "none",
+                        background: "transparent",
+                        fontFamily: "var(--font-jetbrains), monospace",
+                        fontSize: "11px",
+                        outline: "none",
+                        color: "var(--color-primary)",
+                      }}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={lookupLoading}
+                      className="font-mono"
+                      style={{
+                        backgroundColor: "var(--color-primary)",
+                        color: "var(--color-on-primary)",
+                        border: "none",
+                        padding: "0 18px",
+                        cursor: "pointer",
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      {lookupLoading ? "..." : "CHECK \u2192"}
+                    </button>
+                  </form>
+                  {lookupError && (
+                    <p className="font-mono" style={{ color: "#ff3b30", fontSize: "11px", marginTop: "6px" }}>
+                      {lookupError}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

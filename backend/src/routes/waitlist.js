@@ -119,7 +119,17 @@ router.post("/", async (req, res) => {
 
     const existingSubmission = await Submission.findOne({ email: email.trim().toLowerCase() });
     if (existingSubmission) {
-      return res.status(400).json({ error: "This email is already on the waitlist." });
+      const submissionsCount = await Submission.countDocuments();
+      const count = 70 + submissionsCount;
+      return res.status(200).json({
+        success: true,
+        alreadyJoined: true,
+        count,
+        name: existingSubmission.name,
+        email: existingSubmission.email,
+        referralCode: existingSubmission.referralCode,
+        message: "Welcome back! You are already on the waitlist.",
+      });
     }
 
     // Generate unique referral code for this user
@@ -166,6 +176,7 @@ router.post("/", async (req, res) => {
       success: true,
       count,
       referralCode,
+      name: newSubmission.name,
       email: newSubmission.email,
     });
   } catch (error) {

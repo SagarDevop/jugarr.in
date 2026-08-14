@@ -1,12 +1,12 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useWaitlist } from "@/context/WaitlistContext.jsx";
 import logoImg from "@/assets/logo.png";
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isJoined, user } = useWaitlist();
   const [activeHash, setActiveHash] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -79,8 +79,13 @@ export default function Header() {
     };
   }, [menuOpen]);
 
-  const handleJoinClick = () => {
+  const handleCtaClick = () => {
     setMenuOpen(false);
+    if (isJoined && user?.email) {
+      navigate(`/success?email=${encodeURIComponent(user.email)}`);
+      return;
+    }
+
     if (location.pathname !== "/") {
       navigate("/#cta");
     } else {
@@ -92,6 +97,8 @@ export default function Header() {
   const handleNavLinkClick = () => {
     setMenuOpen(false);
   };
+
+  const ctaButtonText = isJoined ? "See Your Referrals" : "Join Free Waitlist";
 
   return (
     <nav className="navbar">
@@ -137,8 +144,8 @@ export default function Header() {
 
         {/* Right side: CTA button + hamburger on mobile */}
         <div className="navbar-right">
-          <button className="btn btn-primary navbar-cta" onClick={handleJoinClick}>
-            Join Free Waitlist
+          <button className="btn btn-primary navbar-cta" onClick={handleCtaClick}>
+            {ctaButtonText}
           </button>
           <button
             className={`hamburger-btn ${menuOpen ? "open" : ""}`}
@@ -186,8 +193,8 @@ export default function Header() {
           </Link>
         </div>
         <div className="nav-mobile-footer">
-          <button className="btn btn-primary" style={{ width: "100%" }} onClick={handleJoinClick}>
-            Join Free Waitlist
+          <button className="btn btn-primary" style={{ width: "100%" }} onClick={handleCtaClick}>
+            {ctaButtonText}
           </button>
         </div>
       </div>
