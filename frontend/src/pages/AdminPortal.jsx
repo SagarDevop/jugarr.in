@@ -1080,6 +1080,7 @@ export default function AdminPortal() {
                       <option value="SELL">SELL</option>
                       <option value="CAMPUS LIFE">CAMPUS LIFE</option>
                       <option value="CAREER">CAREER</option>
+                      <option value="LEARNING">LEARNING</option>
                     </select>
 
                     <button
@@ -2826,6 +2827,7 @@ export default function AdminPortal() {
                           <option value="SELL">SELL</option>
                           <option value="CAMPUS LIFE">CAMPUS LIFE</option>
                           <option value="CAREER">CAREER</option>
+                          <option value="LEARNING">LEARNING</option>
                         </select>
                       </div>
                     </div>
