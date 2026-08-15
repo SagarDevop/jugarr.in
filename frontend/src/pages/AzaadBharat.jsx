@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import confetti from "canvas-confetti";
-import { MusicProvider, useMusic } from "../context/MusicContext";
+import { useMusic } from "../context/MusicContext";
 import { getApiBaseUrl } from "../lib/api";
 
 /* ─────────── DATA ─────────── */
@@ -32,15 +33,6 @@ const fmt = (s) => {
 
 /* ─────────── EXPORT ROOT ─────────── */
 export default function AzaadBharat() {
-  return (
-    <MusicProvider>
-      <AzaadBharatInner />
-    </MusicProvider>
-  );
-}
-
-/* ─────────── INNER COMPONENT ─────────── */
-function AzaadBharatInner() {
   const {
     isPlaying,
     meta,
@@ -204,8 +196,11 @@ function AzaadBharatInner() {
         {/* ── dark overlay */}
         <div className="ab-overlay" />
 
-        {/* ── TOP: counter */}
+        {/* ── TOP: counter & home button */}
         <div className="ab-top">
+          <Link to="/" className="ab-home-btn" title="Back to Jugarr">
+            ← Jugarr
+          </Link>
           <div className="ab-counter">
             <span className="ab-dot" />
             <span className="ab-cnt">{count.toLocaleString("en-IN")}</span>
@@ -348,8 +343,34 @@ const CSS = `
 /* ── TOP */
 .ab-top {
   position: relative; z-index: 10;
-  display: flex; justify-content: center;
-  padding: 20px 0 0;
+  display: flex; justify-content: center; align-items: center;
+  padding: 20px 24px 0;
+}
+.ab-home-btn {
+  position: absolute; left: 24px; top: 20px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  padding: 6px 14px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.78rem;
+  font-family: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.ab-home-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.28);
+  color: #fff;
+  transform: translateX(-2px);
+}
+@media (max-width: 600px) {
+  .ab-top { padding-top: 14px; }
+  .ab-home-btn { left: 14px; top: 14px; padding: 5px 10px; font-size: 0.72rem; }
 }
 .ab-counter {
   display: flex; align-items: center; gap: 8px;
