@@ -1,10 +1,8 @@
 /**
  * YouTubePlayerService — Singleton
- * Manages the YouTube IFrame API player instance for playlist playback.
- * Playlist Source of Truth: https://youtube.com/playlist?list=PLCmF-m8tEVcU
+ * Supports custom curated video list and playlist playback.
  */
 
-export const PLAYLIST_ID = 'PLCmF-m8tEVcU';
 const CONTAINER_ID = 'yt-ab-player-root';
 
 let _apiReady = false;
@@ -61,8 +59,8 @@ function _ensureContainer() {
   document.body.appendChild(wrap);
 }
 
-// ── Public: initialise YouTube Playlist player
-export function initPlayer({ onReady, onStateChange, onError }) {
+// ── Public: initialise YouTube player with initial video ID or playlist
+export function initPlayer({ videoId, playlist, onReady, onStateChange, onError }) {
   _loadAPI();
   _ensureContainer();
 
@@ -73,23 +71,28 @@ export function initPlayer({ onReady, onStateChange, onError }) {
     }
 
     try {
+      const playerVars = {
+        autoplay: 0,
+        controls: 0,
+        disablekb: 1,
+        enablejsapi: 1,
+        fs: 0,
+        iv_load_policy: 3,
+        modestbranding: 1,
+        playsinline: 1, // Critical for iOS & Android
+        rel: 0,
+        origin: window.location.origin,
+      };
+
+      if (Array.isArray(playlist) && playlist.length > 0) {
+        playerVars.playlist = playlist.join(',');
+      }
+
       _player = new window.YT.Player(CONTAINER_ID, {
         width: '200',
         height: '200',
-        playerVars: {
-          listType: 'playlist',
-          list: PLAYLIST_ID,
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          enablejsapi: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          modestbranding: 1,
-          playsinline: 1, // Required for mobile iOS & Android
-          rel: 0,
-          origin: window.location.origin,
-        },
+        videoId: videoId || (playlist && playlist[0]),
+        playerVars,
         events: {
           onReady: (e) => onReady?.(e.target),
           onStateChange: (e) => onStateChange?.(e),
