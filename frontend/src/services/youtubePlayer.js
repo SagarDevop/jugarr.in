@@ -1,8 +1,9 @@
 /**
  * YouTubePlayerService — Singleton
- * Supports custom curated video list and playlist playback.
+ * Connects directly to the YouTube Playlist: https://youtube.com/playlist?list=PLCmF-m8tEVcU
  */
 
+export const PLAYLIST_ID = 'PLCmF-m8tEVcU';
 const CONTAINER_ID = 'yt-ab-player-root';
 
 let _apiReady = false;
@@ -10,7 +11,7 @@ let _apiLoading = false;
 let _player = null;
 const _readyQueue = [];
 
-// ── Load the YT IFrame API script once
+// ── Load YouTube IFrame API
 function _loadAPI() {
   if (typeof window === 'undefined') return;
   if (_apiReady || _apiLoading) return;
@@ -39,7 +40,7 @@ function _loadAPI() {
   window.onYouTubeIframeAPIReady = window._ytAbCallback;
 }
 
-// ── Ensure container div exists
+// ── Ensure offscreen container exists
 function _ensureContainer() {
   if (typeof document === 'undefined') return;
   if (document.getElementById(CONTAINER_ID)) return;
@@ -59,8 +60,8 @@ function _ensureContainer() {
   document.body.appendChild(wrap);
 }
 
-// ── Public: initialise YouTube player with initial video ID or playlist
-export function initPlayer({ videoId, playlist, onReady, onStateChange, onError }) {
+// ── Public: Initialise Playlist Player
+export function initPlayer({ onReady, onStateChange, onError }) {
   _loadAPI();
   _ensureContainer();
 
@@ -71,28 +72,23 @@ export function initPlayer({ videoId, playlist, onReady, onStateChange, onError 
     }
 
     try {
-      const playerVars = {
-        autoplay: 0,
-        controls: 0,
-        disablekb: 1,
-        enablejsapi: 1,
-        fs: 0,
-        iv_load_policy: 3,
-        modestbranding: 1,
-        playsinline: 1, // Critical for iOS & Android
-        rel: 0,
-        origin: window.location.origin,
-      };
-
-      if (Array.isArray(playlist) && playlist.length > 0) {
-        playerVars.playlist = playlist.join(',');
-      }
-
       _player = new window.YT.Player(CONTAINER_ID, {
         width: '200',
         height: '200',
-        videoId: videoId || (playlist && playlist[0]),
-        playerVars,
+        playerVars: {
+          listType: 'playlist',
+          list: PLAYLIST_ID,
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          enablejsapi: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+          origin: window.location.origin,
+        },
         events: {
           onReady: (e) => onReady?.(e.target),
           onStateChange: (e) => onStateChange?.(e),
@@ -100,7 +96,7 @@ export function initPlayer({ videoId, playlist, onReady, onStateChange, onError 
         },
       });
     } catch (err) {
-      console.error('Failed to create YT.Player instance:', err);
+      console.error('Failed to initialize YouTube Player:', err);
     }
   };
 

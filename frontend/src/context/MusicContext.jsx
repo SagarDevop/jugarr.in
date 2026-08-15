@@ -6,185 +6,18 @@ import {
   useState,
   useCallback,
 } from 'react';
-import { initPlayer, getPlayer, destroyPlayer } from '../services/youtubePlayer';
-
-/* ─────────────────────────────────────────────────────────────
-   Azaad Bharat Playlist (Exact Order as Requested - 23 Songs)
-───────────────────────────────────────────────────────────── */
-export const PLAYLIST_SONGS = [
-  {
-    id: 1,
-    title: 'जन गण मन (Jana Gana Mana)',
-    artist: 'रवीन्द्रनाथ टैगोर (National Anthem of India)',
-    videoId: 'gT8v878Jt_0',
-    emoji: '🇮🇳',
-  },
-  {
-    id: 2,
-    title: 'वन्दे मातरम् (Vande Mataram)',
-    artist: 'A.R. Rahman (Revival Album)',
-    videoId: 'vGhzp4f6TdQ',
-    emoji: '🙏',
-  },
-  {
-    id: 3,
-    title: 'माँ तुझे सलाम (Maa Tujhe Salaam)',
-    artist: 'A.R. Rahman',
-    videoId: 'J_O74_P7p94',
-    emoji: '🌺',
-  },
-  {
-    id: 4,
-    title: 'ऐ मेरे वतन के लोगों (Ae Mere Watan Ke Logon)',
-    artist: 'Lata Mangeshkar, C. Ramchandra, Kavi Pradeep',
-    videoId: '0t6sC4XW-hY',
-    emoji: '🌹',
-  },
-  {
-    id: 5,
-    title: 'तेरी मिट्टी (Teri Mitti)',
-    artist: 'B Praak, Manoj Muntashir, Arko (Kesari)',
-    videoId: 'wHAy20h5s8U',
-    emoji: '🌾',
-  },
-  {
-    id: 6,
-    title: 'ऐ वतन (Ae Watan)',
-    artist: 'Arijit Singh, Sunidhi Chauhan (Raazi)',
-    videoId: 'l_a6_yS91aA',
-    emoji: '🕊️',
-  },
-  {
-    id: 7,
-    title: 'लहरा दो (Lehra Do)',
-    artist: 'Arijit Singh, Pritam (83)',
-    videoId: '1uU-S4l1l1c',
-    emoji: '🚩',
-  },
-  {
-    id: 8,
-    title: 'कंधों से मिलते हैं कंधे (Kandhon Se Milte Hain Kandhe)',
-    artist: 'Shankar-Ehsaan-Loy, Sonu Nigam, Hariharan (Lakshya)',
-    videoId: 'Wp4r9G5Q5lQ',
-    emoji: '⚔️',
-  },
-  {
-    id: 9,
-    title: 'योद्धा / ये आन तिरंगा है (Yodha / Yeh Aan Tirangaa Hai)',
-    artist: 'Mohammed Aziz, Laxmikant-Pyarelal (Tirangaa)',
-    videoId: '8qL2p_9yG8k',
-    emoji: '🛡️',
-  },
-  {
-    id: 10,
-    title: 'मेरा रंग दे बसंती चोला (Mera Rang De Basanti Chola)',
-    artist: 'Sonu Nigam, Manmohan Waris (The Legend of Bhagat Singh)',
-    videoId: '8QyqZ9l4z0s',
-    emoji: '🔥',
-  },
-  {
-    id: 11,
-    title: 'संदेसे आते हैं / वतनवालों (Sandese Aate Hain / Watanwalon)',
-    artist: 'Sonu Nigam, Roop Kumar Rathod, Anu Malik (Border)',
-    videoId: 'Kk3q0hG8J8g',
-    emoji: '💌',
-  },
-  {
-    id: 12,
-    title: 'मेरा मुल्क मेरा देश (Mera Mulk Mera Desh)',
-    artist: 'Kumar Sanu, Aditya Narayan (Diljale)',
-    videoId: '6gqE5qG_Yf4',
-    emoji: '✨',
-  },
-  {
-    id: 13,
-    title: 'देस रंगीला (Des Rangila)',
-    artist: 'Mahalaxmi Iyer, Jatin-Lalit (Fanaa)',
-    videoId: '0vF8Z_r_9yU',
-    emoji: '🎨',
-  },
-  {
-    id: 14,
-    title: 'हिंदुस्तानी / सुनो गौर से दुनिया वालों (Hindustani)',
-    artist: 'Shankar Mahadevan, Udit Narayan (Street Dancer 3D / Dus)',
-    videoId: 'dGq1h7L3p3E',
-    emoji: '⚡',
-  },
-  {
-    id: 15,
-    title: 'भारत का रहने वाला हूँ (Bharat Ka Rehne Wala Hoon)',
-    artist: 'Mahendra Kapoor, Kalyanji-Anandji (Purab Aur Paschim)',
-    videoId: '4vKq7r_8p6I',
-    emoji: '🌍',
-  },
-  {
-    id: 16,
-    title: 'ये देश है वीर जवानों का (Yeh Desh Hai Veer Jawanon Ka)',
-    artist: 'Mohammed Rafi, Balbir (Naya Daur)',
-    videoId: '3G8p9q_L1yU',
-    emoji: '💪',
-  },
-  {
-    id: 17,
-    title: 'ऐ वतन तेरे लिए / हर करम अपना करेंगे (Ae Watan Tere Liye)',
-    artist: 'Kavita Krishnamurthy, Mohammed Aziz (Karma)',
-    videoId: '5Yp_9qL8J1k',
-    emoji: '🎯',
-  },
-  {
-    id: 18,
-    title: 'मेरी जान तिरंगा है (Meri Jaan Tiranga Hai)',
-    artist: 'Mohammed Aziz, Hariharan (Tirangaa)',
-    videoId: '8yG1qP8L2z4',
-    emoji: '🌟',
-  },
-  {
-    id: 19,
-    title: 'हमने सुना था एक है भारत (Humne Suna Tha Ek Hai Bharat)',
-    artist: 'Sudha Malhotra, Mohammed Rafi (Didi)',
-    videoId: '7qL2p_9yG8k',
-    emoji: '🤝',
-  },
-  {
-    id: 20,
-    title: 'आओ बच्चों तुम्हें दिखाएँ (Aao Bachchon Tumhe Dikhayein)',
-    artist: 'Kavi Pradeep, Hemant Kumar (Jagriti)',
-    videoId: '6pL9yG8q2Jk',
-    emoji: '🚂',
-  },
-  {
-    id: 21,
-    title: 'आई लव माय इंडिया (I Love My India)',
-    artist: 'Kavita Krishnamurthy, Hariharan (Pardes)',
-    videoId: '9pL8q_2yG1k',
-    emoji: '💖',
-  },
-  {
-    id: 22,
-    title: 'जलवा जलवा (Jalwa Jalwa)',
-    artist: 'Sukhwinder Singh, Udit Narayan (Hindustan Ki Kasam)',
-    videoId: '2yG1k9pL8q_',
-    emoji: '🥁',
-  },
-  {
-    id: 23,
-    title: 'मेरा जूता है जापानी (Mera Joota Hai Japani)',
-    artist: 'Mukesh, Shankar-Jaikishan (Shree 420)',
-    videoId: '1k9pL8q_2yG',
-    emoji: '🎩',
-  },
-];
+import { initPlayer, getPlayer, destroyPlayer, PLAYLIST_ID } from '../services/youtubePlayer';
 
 /* ─────────────────────────────────────────
-   LocalStorage Persistence
+   LocalStorage persistence
 ───────────────────────────────────────── */
-const LS_KEY = 'ab_curated_playlist_v1';
+const LS_KEY = 'ab_yt_playlist_state_v2';
 
 function loadSaved() {
   try {
     const d = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
     return {
-      trackIndex: typeof d.trackIndex === 'number' && d.trackIndex >= 0 && d.trackIndex < PLAYLIST_SONGS.length ? d.trackIndex : 0,
+      trackIndex: typeof d.trackIndex === 'number' && d.trackIndex >= 0 ? d.trackIndex : 0,
       volume: typeof d.volume === 'number' ? d.volume : 80,
     };
   } catch {
@@ -198,9 +31,12 @@ function save(trackIndex, volume) {
   } catch {}
 }
 
-const YT_ENDED   = 0;
-const YT_PLAYING = 1;
-const YT_PAUSED  = 2;
+const YT_UNSTARTED = -1;
+const YT_ENDED     = 0;
+const YT_PLAYING   = 1;
+const YT_PAUSED    = 2;
+const YT_BUFFERING = 3;
+const YT_CUED      = 5;
 
 const MusicContext = createContext(null);
 
@@ -210,6 +46,11 @@ export function MusicProvider({ children }) {
   const [playerReady,  setPlayerReady ] = useState(false);
   const [isPlaying,    setIsPlaying   ] = useState(false);
   const [trackIndex,   setTrackIndex  ] = useState(saved.trackIndex);
+  const [totalTracks,  setTotalTracks ] = useState(23);
+  const [playlist,     setPlaylist    ] = useState([]);
+  const [videoId,      setVideoId     ] = useState('');
+  const [ytTitle,      setYtTitle     ] = useState('');
+  const [artist,       setArtist      ] = useState('');
   const [currentTime,  setCurrentTime ] = useState(0);
   const [duration,     setDuration    ] = useState(0);
   const [volume,       setVolume      ] = useState(saved.volume);
@@ -222,27 +63,58 @@ export function MusicProvider({ children }) {
   const trackIndexRef = useRef(trackIndex);
   trackIndexRef.current = trackIndex;
 
-  const currentSong = PLAYLIST_SONGS[trackIndex] || PLAYLIST_SONGS[0];
-  const videoIds = PLAYLIST_SONGS.map((s) => s.videoId);
-
-  /* Sync Media Session API */
-  const updateMediaSession = useCallback((song) => {
-    if (typeof window === 'undefined' || !('mediaSession' in navigator)) return;
+  /* Sync Video Data & Playlist info from YouTube Player */
+  const syncPlayerInfo = useCallback(() => {
+    const player = getPlayer();
+    if (!player) return;
 
     try {
-      const thumbUrl = song.videoId ? `https://img.youtube.com/vi/${song.videoId}/hqdefault.jpg` : '/bharat.webp';
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: song.title,
-        artist: song.artist,
-        album: 'Azaad Bharat 🇮🇳 | Jugarr',
-        artwork: [
-          { src: thumbUrl, sizes: '512x512', type: 'image/jpeg' },
-          { src: '/bharat.webp', sizes: '512x512', type: 'image/webp' },
-          { src: '/icon.png', sizes: '192x192', type: 'image/png' },
-        ],
-      });
-    } catch {}
-  }, []);
+      // 1. Sync Video Metadata (Title, Artist, Video ID)
+      const data = player.getVideoData?.() || {};
+      if (data.title && data.title !== ytTitle) {
+        setYtTitle(data.title);
+      }
+      if (data.author && data.author !== artist) {
+        setArtist(data.author);
+      }
+      if (data.video_id && data.video_id !== videoId) {
+        setVideoId(data.video_id);
+      }
+
+      // 2. Sync Playlist and Track Index
+      const pl = player.getPlaylist?.() || [];
+      if (Array.isArray(pl) && pl.length > 0) {
+        setPlaylist(pl);
+        setTotalTracks(pl.length);
+      }
+
+      const idx = player.getPlaylistIndex?.() ?? -1;
+      if (idx >= 0 && idx !== trackIndexRef.current) {
+        setTrackIndex(idx);
+        save(idx, volume);
+      }
+
+      // 3. Update Media Session API for mobile lock screen / notifications
+      if (typeof window !== 'undefined' && 'mediaSession' in navigator && data.title) {
+        try {
+          const vId = data.video_id;
+          const thumbUrl = vId ? `https://img.youtube.com/vi/${vId}/hqdefault.jpg` : '/bharat.webp';
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: data.title,
+            artist: data.author || 'Azaad Bharat Playlist',
+            album: 'Azaad Bharat 🇮🇳',
+            artwork: [
+              { src: thumbUrl, sizes: '512x512', type: 'image/jpeg' },
+              { src: '/bharat.webp', sizes: '512x512', type: 'image/webp' },
+              { src: '/icon.png', sizes: '192x192', type: 'image/png' },
+            ],
+          });
+        } catch {}
+      }
+    } catch (err) {
+      console.warn('Sync error from YouTube Player:', err);
+    }
+  }, [volume, ytTitle, artist, videoId]);
 
   /* Progress tick timer */
   const startTick = useCallback(() => {
@@ -255,63 +127,45 @@ export function MusicProvider({ children }) {
         const d = p.getDuration?.()    ?? 0;
         setCurrentTime(t);
         if (d > 0) setDuration(d);
+
+        const idx = p.getPlaylistIndex?.() ?? -1;
+        if (idx >= 0 && idx !== trackIndexRef.current) {
+          setTrackIndex(idx);
+          save(idx, volume);
+        }
+        syncPlayerInfo();
       } catch {}
     }, 400);
-  }, []);
+  }, [volume, syncPlayerInfo]);
 
   const stopTick = useCallback(() => clearInterval(tickRef.current), []);
 
-  /* Unlock on user interaction */
+  /* ── User interaction unlock */
   const unlock = useCallback(() => {
     if (unlockedRef.current) return;
     unlockedRef.current = true;
     setUnlocked(true);
   }, []);
 
-  /* Play song at index */
-  const playTrack = useCallback((index, shouldPlay = true) => {
-    const clamped = Math.max(0, Math.min(index, PLAYLIST_SONGS.length - 1));
-    setTrackIndex(clamped);
-    trackIndexRef.current = clamped;
-    save(clamped, volume);
-    setCurrentTime(0);
-    setPlayerError(null);
-
-    const song = PLAYLIST_SONGS[clamped];
-    updateMediaSession(song);
-
-    const player = getPlayer();
-    if (player && typeof player.loadVideoById === 'function') {
-      try {
-        if (shouldPlay) {
-          player.loadVideoById(song.videoId);
-          setIsPlaying(true);
-        } else {
-          player.cueVideoById(song.videoId);
-        }
-      } catch (err) {
-        console.warn('Track play error:', err);
-      }
-    }
-  }, [volume, updateMediaSession]);
-
-  /* Controls */
+  /* ── Controls */
   const play = useCallback(() => {
     unlock();
-    const player = getPlayer();
-    if (!player) return;
     try {
-      player.playVideo();
-      setIsPlaying(true);
+      const p = getPlayer();
+      if (p) {
+        p.playVideo();
+        setIsPlaying(true);
+      }
     } catch {}
   }, [unlock]);
 
   const pause = useCallback(() => {
-    const player = getPlayer();
-    if (!player) return;
     try {
-      player.pauseVideo();
-      setIsPlaying(false);
+      const p = getPlayer();
+      if (p) {
+        p.pauseVideo();
+        setIsPlaying(false);
+      }
     } catch {}
   }, []);
 
@@ -321,15 +175,39 @@ export function MusicProvider({ children }) {
 
   const next = useCallback(() => {
     unlock();
-    const nextIdx = (trackIndexRef.current + 1) % PLAYLIST_SONGS.length;
-    playTrack(nextIdx, true);
-  }, [unlock, playTrack]);
+    try {
+      const p = getPlayer();
+      if (p) {
+        p.nextVideo();
+        setIsPlaying(true);
+      }
+    } catch {}
+    setTimeout(syncPlayerInfo, 600);
+  }, [unlock, syncPlayerInfo]);
 
   const prev = useCallback(() => {
     unlock();
-    const prevIdx = (trackIndexRef.current - 1 + PLAYLIST_SONGS.length) % PLAYLIST_SONGS.length;
-    playTrack(prevIdx, true);
-  }, [unlock, playTrack]);
+    try {
+      const p = getPlayer();
+      if (p) {
+        p.previousVideo();
+        setIsPlaying(true);
+      }
+    } catch {}
+    setTimeout(syncPlayerInfo, 600);
+  }, [unlock, syncPlayerInfo]);
+
+  const playAt = useCallback((index) => {
+    unlock();
+    try {
+      const p = getPlayer();
+      if (p) {
+        p.playVideoAt(index);
+        setIsPlaying(true);
+      }
+    } catch {}
+    setTimeout(syncPlayerInfo, 600);
+  }, [unlock, syncPlayerInfo]);
 
   const seekTo = useCallback((ratio) => {
     const d = duration || 1;
@@ -347,17 +225,25 @@ export function MusicProvider({ children }) {
     } catch {}
   }, []);
 
-  /* Initialise YouTube Player */
+  /* Init YouTube Playlist Player */
   useEffect(() => {
     initPlayer({
-      videoId: currentSong.videoId,
-      playlist: videoIds,
       onReady: (player) => {
         setPlayerReady(true);
         if (player && typeof player.setVolume === 'function') {
           player.setVolume(volume);
         }
-        updateMediaSession(currentSong);
+
+        // Restore previous track position
+        const idx = saved.trackIndex;
+        if (idx > 0 && player && typeof player.playVideoAt === 'function') {
+          try {
+            player.playVideoAt(idx);
+            if (typeof player.pauseVideo === 'function') player.pauseVideo();
+          } catch {}
+        }
+
+        setTimeout(syncPlayerInfo, 600);
       },
 
       onStateChange: (e) => {
@@ -367,6 +253,7 @@ export function MusicProvider({ children }) {
           setBuffering(false);
           setPlayerError(null);
           startTick();
+          syncPlayerInfo();
           if (typeof window !== 'undefined' && 'mediaSession' in navigator) {
             navigator.mediaSession.playbackState = 'playing';
           }
@@ -376,24 +263,32 @@ export function MusicProvider({ children }) {
           if (typeof window !== 'undefined' && 'mediaSession' in navigator) {
             navigator.mediaSession.playbackState = 'paused';
           }
-        } else if (state === 3) { // Buffering
+        } else if (state === YT_BUFFERING) {
           setBuffering(true);
         } else if (state === YT_ENDED) {
           setIsPlaying(false);
           stopTick();
-          // Auto-play next track in 23-song playlist
-          const nextIdx = (trackIndexRef.current + 1) % PLAYLIST_SONGS.length;
-          playTrack(nextIdx, true);
+          // Auto-play next track in the playlist
+          try {
+            e.target.nextVideo();
+          } catch {}
+        } else if (state === YT_UNSTARTED || state === YT_CUED) {
+          setIsPlaying(false);
+          setBuffering(false);
+          syncPlayerInfo();
         }
       },
 
-      onError: () => {
+      onError: (err) => {
+        console.warn('YouTube Player error code:', err?.data);
         setPlayerError('Skipping unavailable track...');
         setIsPlaying(false);
         stopTick();
+        // Skip to next available track in playlist
         setTimeout(() => {
-          const nextIdx = (trackIndexRef.current + 1) % PLAYLIST_SONGS.length;
-          playTrack(nextIdx, true);
+          try {
+            getPlayer()?.nextVideo();
+          } catch {}
         }, 1200);
       },
     });
@@ -421,17 +316,24 @@ export function MusicProvider({ children }) {
     };
   }, []);
 
+  /* Save volume updates */
+  useEffect(() => {
+    save(trackIndex, volume);
+  }, [volume, trackIndex]);
+
+  // Derived display values
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const currentPosition = `${trackIndex + 1}/${PLAYLIST_SONGS.length}`;
-  const thumbnail = currentSong.videoId ? `https://img.youtube.com/vi/${currentSong.videoId}/hqdefault.jpg` : '/bharat.webp';
+  const currentPosition = totalTracks > 0 ? `${trackIndex + 1}/${totalTracks}` : `${trackIndex + 1}`;
+  const thumbnail = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/bharat.webp';
 
   const meta = {
-    title: currentSong.title,
-    artist: currentSong.artist,
+    title: ytTitle || 'Azaad Bharat',
+    artist: artist || 'YouTube Playlist',
     thumbnail,
     position: currentPosition,
-    totalTracks: PLAYLIST_SONGS.length,
+    totalTracks,
     trackIndex,
+    playlistId: PLAYLIST_ID,
   };
 
   const value = {
@@ -439,11 +341,11 @@ export function MusicProvider({ children }) {
     isPlaying,
     buffering,
     trackIndex,
-    totalTracks: PLAYLIST_SONGS.length,
-    playlist: PLAYLIST_SONGS,
-    currentSong,
-    ytTitle: currentSong.title,
-    artist: currentSong.artist,
+    totalTracks,
+    playlist,
+    videoId,
+    ytTitle,
+    artist,
     thumbnail,
     meta,
     currentTime,
@@ -457,7 +359,7 @@ export function MusicProvider({ children }) {
     togglePlay,
     next,
     prev,
-    playTrack,
+    playAt,
     seekTo,
     changeVolume,
     unlock,
