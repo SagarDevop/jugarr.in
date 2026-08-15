@@ -243,35 +243,22 @@ export default function AzaadBharat() {
 
         {/* ── BOTTOM: music player */}
         <div className="ab-player">
-          <div className={`ab-spin-tiranga ${isPlaying ? 'ab-spinning' : 'ab-paused'}`}>
-            {meta?.thumbnail && meta.thumbnail !== '/bharat.webp' ? (
-              <img
-                src={meta.thumbnail}
-                alt="Thumbnail"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                }}
-              />
-            ) : (
-              <svg viewBox="0 0 100 100" style={{ width: "16px", height: "16px" }}>
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#000080" strokeWidth="6" />
-                <circle cx="50" cy="50" r="6" fill="#000080" />
-                {[...Array(24)].map((_, i) => (
-                  <line
-                    key={i}
-                    x1="50"
-                    y1="50"
-                    x2={50 + 40 * Math.cos((i * 15 * Math.PI) / 180)}
-                    y2={50 + 40 * Math.sin((i * 15 * Math.PI) / 180)}
-                    stroke="#000080"
-                    strokeWidth="3.5"
-                  />
-                ))}
-              </svg>
-            )}
+          <div className={`ab-spin-tiranga ${isPlaying ? 'ab-spinning' : 'ab-paused'}`} title="Tiranga Ashoka Chakra">
+            <svg viewBox="0 0 100 100" style={{ width: "18px", height: "18px" }}>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#000080" strokeWidth="6" />
+              <circle cx="50" cy="50" r="6" fill="#000080" />
+              {[...Array(24)].map((_, i) => (
+                <line
+                  key={i}
+                  x1="50"
+                  y1="50"
+                  x2={50 + 40 * Math.cos((i * 15 * Math.PI) / 180)}
+                  y2={50 + 40 * Math.sin((i * 15 * Math.PI) / 180)}
+                  stroke="#000080"
+                  strokeWidth="3.5"
+                />
+              ))}
+            </svg>
           </div>
 
           <div className="ab-player-mid">
