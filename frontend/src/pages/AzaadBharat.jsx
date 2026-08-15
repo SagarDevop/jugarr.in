@@ -244,26 +244,48 @@ export default function AzaadBharat() {
         {/* ── BOTTOM: music player */}
         <div className="ab-player">
           <div className={`ab-spin-tiranga ${isPlaying ? 'ab-spinning' : 'ab-paused'}`}>
-            <svg viewBox="0 0 100 100" style={{ width: "16px", height: "16px" }}>
-              <circle cx="50" cy="50" r="40" fill="none" stroke="#000080" strokeWidth="6" />
-              <circle cx="50" cy="50" r="6" fill="#000080" />
-              {[...Array(24)].map((_, i) => (
-                <line
-                  key={i}
-                  x1="50"
-                  y1="50"
-                  x2={50 + 40 * Math.cos((i * 15 * Math.PI) / 180)}
-                  y2={50 + 40 * Math.sin((i * 15 * Math.PI) / 180)}
-                  stroke="#000080"
-                  strokeWidth="3.5"
-                />
-              ))}
-            </svg>
+            {meta?.thumbnail && meta.thumbnail !== '/bharat.webp' ? (
+              <img
+                src={meta.thumbnail}
+                alt="Thumbnail"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <svg viewBox="0 0 100 100" style={{ width: "16px", height: "16px" }}>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#000080" strokeWidth="6" />
+                <circle cx="50" cy="50" r="6" fill="#000080" />
+                {[...Array(24)].map((_, i) => (
+                  <line
+                    key={i}
+                    x1="50"
+                    y1="50"
+                    x2={50 + 40 * Math.cos((i * 15 * Math.PI) / 180)}
+                    y2={50 + 40 * Math.sin((i * 15 * Math.PI) / 180)}
+                    stroke="#000080"
+                    strokeWidth="3.5"
+                  />
+                ))}
+              </svg>
+            )}
           </div>
 
           <div className="ab-player-mid">
-            <div className="ab-player-song">{displayTitle}</div>
-            <div className="ab-player-artist">{displayArtist}</div>
+            <div className="ab-player-song" title={displayTitle}>
+              {displayTitle}
+            </div>
+            <div className="ab-player-meta-row">
+              <span className="ab-player-artist">{displayArtist}</span>
+              {meta?.position && (
+                <span className="ab-player-pos-badge" title="Playlist Position">
+                  {meta.position}
+                </span>
+              )}
+            </div>
             <div className="ab-player-bar" onClick={handleSeek}>
               <div className="ab-player-bar-track">
                 <div className="ab-player-bar-fill" style={{ width: `${progress}%` }} />
@@ -535,8 +557,24 @@ const CSS = `
   margin-bottom: 2px;
 }
 .ab-player-artist {
-  font-size: 0.72rem; color: rgba(255,255,255,0.35);
+  font-size: 0.72rem; color: rgba(255,255,255,0.45);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ab-player-meta-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
   margin-bottom: 8px;
+}
+.ab-player-pos-badge {
+  font-size: 0.64rem; font-weight: 700;
+  font-family: var(--font-jetbrains, monospace);
+  color: rgba(255, 180, 60, 0.95);
+  background: rgba(255, 140, 0, 0.14);
+  border: 1px solid rgba(255, 140, 0, 0.28);
+  border-radius: 999px;
+  padding: 1px 6px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .ab-player-bar { cursor: pointer; }
 .ab-player-bar-track {
