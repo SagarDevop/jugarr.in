@@ -179,17 +179,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Right side: Independence Day Badge + CTA button + hamburger on mobile */}
+          {/* Right side: CTA button + hamburger on mobile */}
           <div className="navbar-right" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Link
-              to="/azaad-bharat"
-              className="azaad-badge-link"
-              title="Celebrate Independence Day - Azaad Bharat"
-            >
-              <span style={{ fontSize: "13px", lineHeight: 1 }}>🇮🇳</span>
-              <span>15 AUG</span>
-            </Link>
-
             {!isJoined && (
               <button
                 type="button"
@@ -216,30 +207,6 @@ export default function Header() {
                   display: block !important;
                 }
               }
-              .azaad-badge-link {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 5px 9px;
-                background: #fffaf5;
-                border: 1px solid #f97316;
-                border-radius: 999px;
-                font-family: var(--font-jetbrains), monospace;
-                font-size: 11px;
-                font-weight: 600;
-                color: #c2410c;
-                text-decoration: none;
-                line-height: 1;
-                white-space: nowrap;
-                transition: all 0.15s ease;
-                box-shadow: 0 1px 3px rgba(249, 115, 22, 0.12);
-              }
-              .azaad-badge-link:hover {
-                background: #ffedd5;
-                border-color: #ea580c;
-                transform: translateY(-1px);
-                box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
-              }
             `}</style>
             <button className="btn btn-primary navbar-cta" onClick={handleCtaClick}>
               {ctaButtonText}
@@ -260,30 +227,6 @@ export default function Header() {
         {/* Mobile dropdown menu */}
         <div className={`nav-mobile-menu ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
           <div className="nav-mobile-links">
-            <Link
-              to="/azaad-bharat"
-              className={`nav-mobile-link ${location.pathname === "/azaad-bharat" ? "active" : ""}`}
-              onClick={handleNavLinkClick}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                color: "#ea580c",
-                fontWeight: "600",
-              }}
-            >
-              <span>🇮🇳 Azaad Bharat</span>
-              <span style={{
-                fontSize: "9px",
-                background: "#f97316",
-                color: "#fff",
-                padding: "2px 6px",
-                borderRadius: "999px",
-                fontWeight: "700",
-              }}>
-                15 AUG
-              </span>
-            </Link>
             <Link
               to="/#ecosystem"
               className={`nav-mobile-link ${activeHash === "#ecosystem" ? "active" : ""}`}
